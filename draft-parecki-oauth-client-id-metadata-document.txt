@@ -76,9 +76,13 @@ Table of Contents
    2.  Conventions and Definitions
    3.  Client Identifier
    4.  Client Information Discovery
-     4.1.  Redirect URL Registration
+     4.1.  Metadata Discovery Errors
+     4.2.  Redirect URL Registration
+     4.3.  Metadata Caching
    5.  Security Considerations
      5.1.  Public vs Confidential Clients
+     5.2.  OAuth Phishing Attacks
+     5.3.  Server Side Request Forgery (SSRF) Attacks
    6.  IANA Considerations
    7.  References
      7.1.  Normative References
@@ -122,6 +126,11 @@ Table of Contents
    NOT contain a fragment component, MUST NOT contain a username or
    password component, and MAY contain a port.
 
+   This specification places no restrictions on what URL is used as a
+   client identifier.  A short URL is RECOMMENDED, since the URL may be
+   displayed to the end user in the authorization interface or in
+   management interfaces.
+
 4.  Client Information Discovery
 
    One purpose of registering clients at the authorization server is so
@@ -130,7 +139,16 @@ Table of Contents
    information about the client to the user in an authorziation consent
    screen, for example the client name and logo.
 
-4.1.  Redirect URL Registration
+   The authorization server SHOULD fetch the document indicated by the
+   client_id to retrieve the client registration information.
+
+4.1.  Metadata Discovery Errors
+
+   If fetching the metadata document fails, the authorization server MAY
+   abort the authorization request, or continue with the information it
+   has available.
+
+4.2.  Redirect URL Registration
 
    According to [I-D.draft-ietf-oauth-security-topics], the
    authorization server MUST require registration of redirect URLs, and
@@ -139,7 +157,19 @@ Table of Contents
    authorization server which is used when comparing the redirect URL in
    an authorization request against the registered redirect URLs.
 
+4.3.  Metadata Caching
+
+   The authorization server MAY cache the client information it
+   discovers at the metadata document URL.
+
+   TBD: recommend a cache lifetime? considerations about stale data?
+
 5.  Security Considerations
+
+   In addition to the security considerations in OAuth 2.0 Core
+   [RFC6749], and OAuth 2.0 Threat Model and Security Considerations
+   [RFC6819], and [I-D.draft-ietf-oauth-security-topics] the additional
+   considerations apply.
 
 5.1.  Public vs Confidential Clients
 
@@ -165,6 +195,35 @@ Table of Contents
    communication with the authorization server MUST include client
    authentication of the registered type.
 
+5.2.  OAuth Phishing Attacks
+
+   Authorization servers SHOULD fetch the client_id metadata document
+   provided in the authorization request in order to provide users with
+   additional information about the request, such as the application
+   name and logo.  If the server does not fetch the client information,
+   then it SHOULD take additional measures to ensure the user is
+   provided with as much information as possible about the request.
+
+   The authorization server SHOULD display the hostname of the client_id
+   on the authorization interface, in addition to displaying the fetched
+   client information if any.  Displaying the hostname helps users know
+   that they are authorizing the expected application.
+
+   If fetching the client metadata fails for any reason, the client_id
+   URL is the only piece of information the user has as an indication of
+   which application they are authorizing.
+
+5.3.  Server Side Request Forgery (SSRF) Attacks
+
+   Authorization servers fetching the client metadata document and
+   resolving URLs located in the metadata document should be aware of
+   possible SSRF attacks.  Authorization servers SHOULD avoid fetching
+   any URLs using private or loopback addresses and consider network
+   policies or other measures to prevent making requests to these
+   addresses.  Authorization servers SHOULD also be aware of the
+   possibility that URLs might be non-http-based URI schemes which can
+   lead to other possible SSRF attack vectors.
+
 6.  IANA Considerations
 
    This document has no IANA actions.
@@ -189,6 +248,11 @@ Table of Contents
    [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
               RFC 6749, DOI 10.17487/RFC6749, October 2012,
               <https://www.rfc-editor.org/rfc/rfc6749>.
+
+   [RFC6819]  Lodderstedt, T., Ed., McGloin, M., and P. Hunt, "OAuth 2.0
+              Threat Model and Security Considerations", RFC 6819,
+              DOI 10.17487/RFC6819, January 2013,
+              <https://www.rfc-editor.org/rfc/rfc6819>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
