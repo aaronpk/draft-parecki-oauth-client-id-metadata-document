@@ -109,14 +109,12 @@ public/private key pairs, by publishing the public key in their metadata documen
 For example, the client MAY include the following properties in its metadata document
 to establish a public key and the `private_key_jwt` authentication method:
 
-```
-{
-  ...
-  "token_endpoint_auth_method": "private_key_jwt",
-  "jwks_uri": "https://client.example.com/jwks.json"
-  ...
-}
-```
+    {
+      ...
+      "token_endpoint_auth_method": "private_key_jwt",
+      "jwks_uri": "https://client.example.com/jwks.json"
+      ...
+    }
 
 This establishes this client as a confidential client, and any communication with
 the authorization server MUST include client authentication of the registered type.
