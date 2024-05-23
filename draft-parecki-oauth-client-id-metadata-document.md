@@ -32,6 +32,7 @@ author:
 
 normative:
   RFC6749:
+  RFC6819:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
