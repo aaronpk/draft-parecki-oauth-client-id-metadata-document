@@ -3,7 +3,7 @@ title: "OAuth Client ID Metadata Document"
 abbrev: "Client ID Document"
 category: info
 
-docname: draft-parecki-oauth-client-id-metadata-document
+docname: draft-parecki-oauth-client-id-metadata-document-latest
 submissiontype: IETF
 number:
 date:
