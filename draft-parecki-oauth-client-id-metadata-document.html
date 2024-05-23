@@ -1265,14 +1265,16 @@ credentials at the authorization server by using authentication methods that use
 public/private key pairs, by publishing the public key in their metadata document.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">For example, the client <span class="bcp14">MAY</span> include the following properties in its metadata document
 to establish a public key and the <code>private_key_jwt</code> authentication method:<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3"><code>
+<div class="alignLeft art-text artwork" id="section-5.1-3">
+<pre>
 {
   ...
   "token_endpoint_auth_method": "private_key_jwt",
   "jwks_uri": "https://client.example.com/jwks.json"
   ...
 }
-</code><a href="#section-5.1-3" class="pilcrow">¶</a></p>
+</pre><a href="#section-5.1-3" class="pilcrow">¶</a>
+</div>
 <p id="section-5.1-4">This establishes this client as a confidential client, and any communication with
 the authorization server <span class="bcp14">MUST</span> include client authentication of the registered type.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 </section>
