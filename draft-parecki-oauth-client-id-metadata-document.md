@@ -35,6 +35,7 @@ normative:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
+  RFC7591:
 
 
 --- abstract
@@ -50,9 +51,14 @@ In order for an OAuth 2.0 {{RFC6749}} client to utilize an OAuth 2.0
 authorization server, the client needs to establish a unique
 identifier, and needs to to provide the server with metadata about
 the application, such as the application name and icon.  In cases
-where an application is interacting with authorization servers that
-the developer of the application has no relationship with, manual
-registration is impossible.
+where a client is interacting with authorization servers that it has
+no relationship with, manual registration is impossible.
+
+While Dynamic Client Registration {{RFC7591}} can provide a method for a previously
+unknown client to establish itself at an authorization server and
+obtain a client idenfier, this is not always practical in some deployments
+and can create additional challenges around management of the registration
+data and cleanup of inactive clients.
 
 This specification describes how an OAuth 2.0 client can publish its
 own registration information and avoid the need for pre-registering
