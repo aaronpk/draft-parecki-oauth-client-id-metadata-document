@@ -9,16 +9,16 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: Web Authorization Working Group
+area: "Security"
+workgroup: "Web Authorization Protocol"
 keyword:
  - oauth
 venue:
-  group: Web Authorization WG
-  type: Working Group
-  mail: oauth@ietf.org
-  github: aaronpk/draft-parecki-oauth-client-id-metadata-document
-  latest: https://example.com/LATEST
+  group: "Web Authorization Protocol"
+  type: "Working Group"
+  mail: "oauth@ietf.org"
+  github: "aaronpk/draft-parecki-oauth-client-id-metadata-document"
+  latest: "https://aaronpk.github.io/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html"
 
 author:
  -
