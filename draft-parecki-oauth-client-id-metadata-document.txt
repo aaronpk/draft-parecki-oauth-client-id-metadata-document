@@ -76,17 +76,16 @@ Table of Contents
    2.  Conventions and Definitions
    3.  Client Identifier
    4.  Client Information Discovery
-     4.1.  Metadata Discovery Errors
-     4.2.  Redirect URL Registration
-     4.3.  Metadata Caching
+     4.1.  Client Metadata
+     4.2.  Metadata Discovery Errors
+     4.3.  Redirect URL Registration
+     4.4.  Metadata Caching
    5.  Security Considerations
      5.1.  Public vs Confidential Clients
      5.2.  OAuth Phishing Attacks
      5.3.  Server Side Request Forgery (SSRF) Attacks
    6.  IANA Considerations
-   7.  References
-     7.1.  Normative References
-     7.2.  Informative References
+   7.  Normative References
    Acknowledgments
    Authors' Addresses
 
@@ -142,13 +141,19 @@ Table of Contents
    The authorization server SHOULD fetch the document indicated by the
    client_id to retrieve the client registration information.
 
-4.1.  Metadata Discovery Errors
+4.1.  Client Metadata
+
+   The client metadata document URL is a JSON document containing the
+   metadata of the client.  The client metadata values are the values
+   defined in OAuth Dynamic Client Registration ([RFC7591]) section 2.
+
+4.2.  Metadata Discovery Errors
 
    If fetching the metadata document fails, the authorization server MAY
    abort the authorization request, or continue with the information it
    has available.
 
-4.2.  Redirect URL Registration
+4.3.  Redirect URL Registration
 
    According to [I-D.draft-ietf-oauth-security-topics], the
    authorization server MUST require registration of redirect URLs, and
@@ -157,7 +162,7 @@ Table of Contents
    authorization server which is used when comparing the redirect URL in
    an authorization request against the registered redirect URLs.
 
-4.3.  Metadata Caching
+4.4.  Metadata Caching
 
    The authorization server MAY cache the client information it
    discovers at the metadata document URL.
@@ -228,9 +233,7 @@ Table of Contents
 
    This document has no IANA actions.
 
-7.  References
-
-7.1.  Normative References
+7.  Normative References
 
    [I-D.draft-ietf-oauth-security-topics]
               Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
@@ -254,16 +257,14 @@ Table of Contents
               DOI 10.17487/RFC6819, January 2013,
               <https://www.rfc-editor.org/rfc/rfc6819>.
 
-   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
-              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
-              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
-
-7.2.  Informative References
-
    [RFC7591]  Richer, J., Ed., Jones, M., Bradley, J., Machulak, M., and
               P. Hunt, "OAuth 2.0 Dynamic Client Registration Protocol",
               RFC 7591, DOI 10.17487/RFC7591, July 2015,
               <https://www.rfc-editor.org/rfc/rfc7591>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
 Acknowledgments
 
