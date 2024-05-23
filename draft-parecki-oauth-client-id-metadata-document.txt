@@ -80,7 +80,9 @@ Table of Contents
    5.  Security Considerations
      5.1.  Public vs Confidential Clients
    6.  IANA Considerations
-   7.  Normative References
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -90,9 +92,14 @@ Table of Contents
    authorization server, the client needs to establish a unique
    identifier, and needs to to provide the server with metadata about
    the application, such as the application name and icon.  In cases
-   where an application is interacting with authorization servers that
-   the developer of the application has no relationship with, manual
-   registration is impossible.
+   where a client is interacting with authorization servers that it has
+   no relationship with, manual registration is impossible.
+
+   While Dynamic Client Registration [RFC7591] can provide a method for
+   a previously unknown client to establish itself at an authorization
+   server and obtain a client idenfier, this is not always practical in
+   some deployments and can create additional challenges around
+   management of the registration data and cleanup of inactive clients.
 
    This specification describes how an OAuth 2.0 client can publish its
    own registration information and avoid the need for pre-registering
@@ -158,7 +165,9 @@ Table of Contents
 
    This document has no IANA actions.
 
-7.  Normative References
+7.  References
+
+7.1.  Normative References
 
    [I-D.draft-ietf-oauth-security-topics]
               Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
@@ -180,6 +189,13 @@ Table of Contents
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+7.2.  Informative References
+
+   [RFC7591]  Richer, J., Ed., Jones, M., Bradley, J., Machulak, M., and
+              P. Hunt, "OAuth 2.0 Dynamic Client Registration Protocol",
+              RFC 7591, DOI 10.17487/RFC7591, July 2015,
+              <https://www.rfc-editor.org/rfc/rfc7591>.
 
 Acknowledgments
 
