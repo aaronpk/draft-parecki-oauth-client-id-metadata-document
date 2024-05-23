@@ -33,6 +33,7 @@ author:
 normative:
   RFC6749:
   RFC6819:
+  RFC7591:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
@@ -95,6 +96,12 @@ client name and logo.
 
 The authorization server SHOULD fetch the document indicated by the `client_id`
 to retrieve the client registration information.
+
+## Client Metadata
+
+The client metadata document URL is a JSON document containing the metadata
+of the client. The client metadata values are the values defined in
+OAuth Dynamic Client Registration ({{RFC7591}}) section 2.
 
 
 ## Metadata Discovery Errors
