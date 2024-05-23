@@ -37,7 +37,6 @@ normative:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
-  RFC7591:
 
 
 --- abstract
