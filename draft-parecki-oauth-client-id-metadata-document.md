@@ -78,6 +78,11 @@ contain single-dot or double-dot path segments, MAY contain a query
 string component, MUST NOT contain a fragment component, MUST NOT
 contain a username or password component, and MAY contain a port.
 
+This specification places no restrictions on what URL is used as
+a client identifier. A short URL is RECOMMENDED, since the URL may
+be displayed to the end user in the authorization interface or in
+management interfaces.
+
 
 # Client Information Discovery
 
@@ -86,6 +91,16 @@ the authorziation server has additional information about the client that
 can be used during an OAuth flow, such as presenting information about
 the client to the user in an authorziation consent screen, for example the
 client name and logo.
+
+The authorization server SHOULD fetch the document indicated by the `client_id`
+to retrieve the client registration information.
+
+
+## Metadata Discovery Errors
+
+If fetching the metadata document fails, the authorization server MAY abort the
+authorization request, or continue with the information it has available.
+
 
 ## Redirect URL Registration
 
@@ -97,7 +112,17 @@ comparing the redirect URL in an authorization request against the registered
 redirect URLs.
 
 
+## Metadata Caching
+
+The authorization server MAY cache the client information it discovers at the
+metadata document URL.
+
+TBD: recommend a cache lifetime? considerations about stale data?
+
+
 # Security Considerations
+
+In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{I-D.draft-ietf-oauth-security-topics}} the additional considerations apply.
 
 ## Public vs Confidential Clients
 
@@ -118,6 +143,19 @@ to establish a public key and the `private_key_jwt` authentication method:
 
 This establishes this client as a confidential client, and any communication with
 the authorization server MUST include client authentication of the registered type.
+
+## OAuth Phishing Attacks
+
+Authorization servers SHOULD fetch the `client_id` metadata document provided in the authorization request in order to provide users with additional information about the request, such as the application name and logo. If the server does not fetch the client information, then it SHOULD take additional measures to ensure the user is provided with as much information as possible about the request.
+
+The authorization server SHOULD display the hostname of the `client_id` on the authorization interface, in addition to displaying the fetched client information if any. Displaying the hostname helps users know that they are authorizing the expected application.
+
+If fetching the client metadata fails for any reason, the `client_id` URL is the only piece of information the user has as an indication of which application they are authorizing.
+
+
+## Server Side Request Forgery (SSRF) Attacks
+
+Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers SHOULD avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers SHOULD also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.
 
 
 # IANA Considerations
