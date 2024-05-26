@@ -123,7 +123,7 @@ defined in [RFC3986] Section 6.2.1.
 
 The client metadata document MAY define additional properties in the response.
 The client metadata document MAY also be served with more specific content types
-as long as the response is JSON and conforms to application/<AS-defined>+json.
+as long as the response is JSON and conforms to `application/<AS-defined>+json`.
 
 Other specifications MAY place additional restrictions on the contents of the
 client metadata document accepted by authorization servers implementing their
