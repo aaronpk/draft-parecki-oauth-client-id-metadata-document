@@ -12,7 +12,7 @@ v: 3
 area: "Security"
 workgroup: "Web Authorization Protocol"
 keyword:
- - oauth
+  - oauth
 venue:
   group: "Web Authorization Protocol"
   type: "Working Group"
@@ -21,13 +21,11 @@ venue:
   latest: "https://aaronpk.github.io/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html"
 
 author:
- -
-    fullname: Aaron Parecki
+  - fullname: Aaron Parecki
     organization: Okta
     email: aaron@parecki.com
-    url: https://aaronparecki.com
- -
-    fullname: Emelia Smith
+    uri: https://aaronparecki.com
+  - fullname: Emelia Smith
     email: emelia@brandedcode.com
 
 normative:
