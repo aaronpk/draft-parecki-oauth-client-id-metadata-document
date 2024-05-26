@@ -27,6 +27,7 @@ author:
     uri: https://aaronparecki.com
   - fullname: Emelia Smith
     email: emelia@brandedcode.com
+    uri: https://thisismissem.social
 
 normative:
   RFC3986:
@@ -36,7 +37,19 @@ normative:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
-
+  IndieAuth:
+    title: "IndieAuth"
+    target: https://indieauth.spec.indieweb.org/
+  Solid-OIDC:
+    title: "Solid-OIDC"
+    date: 2022-03-28
+    target: https://solidproject.org/TR/2022/oidc-20220328
+    author:
+      - name: Aaron Coburn
+        org: Inrupt
+      - name: elf Pavlik
+        ins: elf Pavlik
+      - name: Dmitri Zagidulin
 
 --- abstract
 
@@ -196,4 +209,6 @@ This document has no IANA actions.
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+The idea of using URIs as the `client_id` in OAuth based authorization requests is not new, and has previously been specified in varying ways by [IndieAuth] and [Solid-OIDC]. This specification is largely inspired by the work of Aaron Coburn, elf Pavlik, and Dmitri Zagidulin in their [Solid-OIDC] specification which defined dereferenceable Client Identifier Documents.
+
+TODO further acknowledgements?
