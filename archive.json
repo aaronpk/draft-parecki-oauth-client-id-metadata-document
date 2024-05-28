@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-05-26T00:29:57.597344+00:00",
+  "timestamp": "2024-05-28T00:27:05.165311+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -50,5 +50,147 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOL_Xevs5wl96g",
+      "title": "Fix yaml frontmatter & prevent prettier from running",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/1",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Was starting to work on the draft, and was having compiling errors due to the yaml frontmatter having been incorrectly formatted by prettier (it really chokes on it), and the `url` property should've been `uri` from what I can tell.",
+      "createdAt": "2024-05-26T16:03:37Z",
+      "updatedAt": "2024-05-26T16:26:20Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "744111c3933074752580695018742b0811838636",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "fix/prettier-and-yaml-frontmatter",
+      "headRefOid": "37f38982d8ecfa22c55be6aa0766918977829544",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "NONE",
+          "body": "One thing I wasn't sure of is what the word-wrapping line length should be on this document? It'd be good to also specify this in the `.editorconfig`",
+          "createdAt": "2024-05-26T16:26:19Z",
+          "updatedAt": "2024-05-26T16:26:19Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOL_Xevs5wmFhI",
+      "title": "Suggested improvements",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/2",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "This is based on #1, but otherwise has a few language and spelling changes; Additionally:\r\n- added the section about the restriction on the `client_id` property strictly matching the client metadata document's URI\r\n- added recommendation to use a stable URL (I'm not sure if there's a spec to refer to, but it'd be bad practice to, for example, include a version number in the URL for cache busting purposes even though the contents of the document has not actually changed.\r\n- added TBD about possible verification endpoint (i.e., giving developers an easy way to verify their document is valid (or perhaps a mechanism to invalidate a previously cached document?)\r\n- added language to allow extensions to the client metadata document, and allowing it to be served as content types other than just `application/json`, e.g., `application/ld+json`\r\n- moved caching up to beneath errors, as to allow language to easily flow about requirements not to cache error responses or invalid documents.\r\n- added TBD question on the redirect URI matching and whether it is exact string matching or simple string comparison (the original language).\r\n- tried to use `client metadata document` more consistently.",
+      "createdAt": "2024-05-26T17:00:57Z",
+      "updatedAt": "2024-05-26T17:32:08Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "744111c3933074752580695018742b0811838636",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "suggested-improvements",
+      "headRefOid": "5f8f9354b8982b38f98f52a69f366264f1f1fc28",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOL_Xevs579mLh",
+          "commit": {
+            "abbreviatedOid": "095163b"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-26T17:01:42Z",
+          "updatedAt": "2024-05-26T17:01:43Z",
+          "comments": [
+            {
+              "originalPosition": 91,
+              "body": "I moved the `MAY`s to the end, to hopefully improve clarity.",
+              "createdAt": "2024-05-26T17:01:43Z",
+              "updatedAt": "2024-05-26T17:01:43Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs579nXw",
+          "commit": {
+            "abbreviatedOid": "095163b"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-26T17:04:32Z",
+          "updatedAt": "2024-05-26T17:04:32Z",
+          "comments": [
+            {
+              "originalPosition": 99,
+              "body": "Would like to find some better language here, maybe referencing [Cool URIs](https://www.w3.org/Provider/Style/URI) is worthwhile?",
+              "createdAt": "2024-05-26T17:04:32Z",
+              "updatedAt": "2024-05-26T17:04:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs579n3C",
+          "commit": {
+            "abbreviatedOid": "095163b"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-26T17:05:42Z",
+          "updatedAt": "2024-05-26T17:05:42Z",
+          "comments": [
+            {
+              "originalPosition": 118,
+              "body": "This is necessary for security, as it prevents a redirect being used as a way to impersonate a client.\r\n\r\nTBD as to the algorithm for comparison: simple string comparison or exact string matching?",
+              "createdAt": "2024-05-26T17:05:42Z",
+              "updatedAt": "2024-05-26T17:05:42Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs579ps_",
+          "commit": {
+            "abbreviatedOid": "095163b"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-26T17:21:34Z",
+          "updatedAt": "2024-05-26T17:21:34Z",
+          "comments": [
+            {
+              "originalPosition": 127,
+              "body": "I'm not sure if I have the language here correct. But basically the idea is that authorization servers may reject specific client types or mandate that certain standard properties must be present and have a given value.",
+              "createdAt": "2024-05-26T17:21:34Z",
+              "updatedAt": "2024-05-26T17:21:34Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
