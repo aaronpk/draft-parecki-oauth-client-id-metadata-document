@@ -13,11 +13,13 @@ Expires: 2 December 2024                                     31 May 2024
 
 Abstract
 
-   This specification defines an endpoint an OAuth client can use to
-   host its client metadata, as well as the use of this URL as a
-   client_id in an OAuth flow.  This enables OAuth clients to work with
-   authorization servers where it has no prior relationship, and enables
-   the authorization server to fetch metadata about the client.
+   This specification defines a mechanism through which an OAuth client
+   can identify itself to authorization servers, without prior dynamic
+   client registration or other existing registration.  This is through
+   the usage of a URL as a client_id in an OAuth flow, where the URL
+   refers to a document containing the necessary client metadata,
+   enabling the authorization server to fetch the metadata about the
+   client as needed.
 
 About This Document
 
@@ -78,14 +80,16 @@ Table of Contents
    4.  Client Information Discovery
      4.1.  Client Metadata
      4.2.  Metadata Discovery Errors
-     4.3.  Redirect URL Registration
-     4.4.  Metadata Caching
+     4.3.  Metadata Caching
+     4.4.  Redirect URL Registration
    5.  Security Considerations
      5.1.  Public vs Confidential Clients
      5.2.  OAuth Phishing Attacks
      5.3.  Server Side Request Forgery (SSRF) Attacks
    6.  IANA Considerations
-   7.  Normative References
+   7.  References
+     7.1.  Normative References
+     7.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -94,14 +98,15 @@ Table of Contents
    In order for an OAuth 2.0 [RFC6749] client to utilize an OAuth 2.0
    authorization server, the client needs to establish a unique
    identifier, and needs to to provide the server with metadata about
-   the application, such as the application name and icon.  In cases
-   where a client is interacting with authorization servers that it has
-   no relationship with, manual registration is impossible.
+   the application, such as the application name, icon and redirect
+   URIs.  In cases where a client is interacting with authorization
+   servers that it has no relationship with, manual registration is
+   impossible.
 
    While Dynamic Client Registration [RFC7591] can provide a method for
    a previously unknown client to establish itself at an authorization
-   server and obtain a client idenfier, this is not always practical in
-   some deployments and can create additional challenges around
+   server and obtain a client identifier, this is not always practical
+   in some deployments and can create additional challenges around
    management of the registration data and cleanup of inactive clients.
 
    This specification describes how an OAuth 2.0 client can publish its
@@ -121,21 +126,22 @@ Table of Contents
    This specification defines the client identifier as a URL with the
    following restrictions.  Client identifier URLs MUST have an "https"
    scheme, MUST contain a path component, MUST NOT contain single-dot or
-   double-dot path segments, MAY contain a query string component, MUST
-   NOT contain a fragment component, MUST NOT contain a username or
-   password component, and MAY contain a port.
+   double-dot path segments, MUST NOT contain a fragment component and
+   MUST NOT contain a username or password component.  Client identifier
+   URLs MAY contain a query string component and MAY contain a port.
 
    This specification places no restrictions on what URL is used as a
    client identifier.  A short URL is RECOMMENDED, since the URL may be
    displayed to the end user in the authorization interface or in
-   management interfaces.
+   management interfaces.  Usage of a stable URL that does not
+   frequently change for the client is also RECOMMENDED.
 
 4.  Client Information Discovery
 
    One purpose of registering clients at the authorization server is so
-   that the authorziation server has additional information about the
+   that the authorization server has additional information about the
    client that can be used during an OAuth flow, such as presenting
-   information about the client to the user in an authorziation consent
+   information about the client to the user in an authorization consent
    screen, for example the client name and logo.
 
    The authorization server SHOULD fetch the document indicated by the
@@ -147,13 +153,42 @@ Table of Contents
    metadata of the client.  The client metadata values are the values
    defined in OAuth Dynamic Client Registration ([RFC7591]) section 2.
 
+   The client metadata document MUST contain a client_id property whose
+   value MUST compare and match the URL of the document using simple
+   string comparison as defined in [RFC3986] Section 6.2.1.
+
+   The client metadata document MAY define additional properties in the
+   response.  The client metadata document MAY also be served with more
+   specific content types as long as the response is JSON and conforms
+   to application/<AS-defined>+json.
+
+   Other specifications MAY place additional restrictions on the
+   contents of the client metadata document accepted by authorization
+   servers implementing their specification, for instance, preventing
+   the registration of confidential clients by requiring the
+   token_endpoint_auth_method property be set to "none".
+
 4.2.  Metadata Discovery Errors
 
-   If fetching the metadata document fails, the authorization server MAY
-   abort the authorization request, or continue with the information it
-   has available.
+   If fetching the metadata document fails, the authorization server
+   SHOULD abort the authorization request.
 
-4.3.  Redirect URL Registration
+4.3.  Metadata Caching
+
+   The authorization server MAY cache the client metadata it discovers
+   at the client metadata document URL.
+
+   TBD: recommend a cache lifetime? considerations about stale data?
+
+   The authorization server MUST NOT cache error responses.  The
+   authorization server also MUST NOT cache documents which are invalid
+   or malformed.
+
+   TBD: Do we want to define an endpoint through which a document can be
+   validated by an authorization server, such that a developer can
+   assert that their document is valid?
+
+4.4.  Redirect URL Registration
 
    According to [I-D.draft-ietf-oauth-security-topics], the
    authorization server MUST require registration of redirect URLs, and
@@ -162,12 +197,8 @@ Table of Contents
    authorization server which is used when comparing the redirect URL in
    an authorization request against the registered redirect URLs.
 
-4.4.  Metadata Caching
-
-   The authorization server MAY cache the client information it
-   discovers at the metadata document URL.
-
-   TBD: recommend a cache lifetime? considerations about stale data?
+   TBD: Is it exact string matching, or is it still using simple string
+   comparison per [RFC3986]
 
 5.  Security Considerations
 
@@ -205,18 +236,18 @@ Table of Contents
    Authorization servers SHOULD fetch the client_id metadata document
    provided in the authorization request in order to provide users with
    additional information about the request, such as the application
-   name and logo.  If the server does not fetch the client information,
-   then it SHOULD take additional measures to ensure the user is
-   provided with as much information as possible about the request.
+   name and logo.  If the server does not fetch the client metadata
+   document, then it SHOULD take additional measures to ensure the user
+   is provided with as much information as possible about the request.
 
    The authorization server SHOULD display the hostname of the client_id
    on the authorization interface, in addition to displaying the fetched
    client information if any.  Displaying the hostname helps users know
    that they are authorizing the expected application.
 
-   If fetching the client metadata fails for any reason, the client_id
-   URL is the only piece of information the user has as an indication of
-   which application they are authorizing.
+   If fetching the client metadata document fails for any reason, the
+   client_id URL is the only piece of information the user has as an
+   indication of which application they are authorizing.
 
 5.3.  Server Side Request Forgery (SSRF) Attacks
 
@@ -233,7 +264,9 @@ Table of Contents
 
    This document has no IANA actions.
 
-7.  Normative References
+7.  References
+
+7.1.  Normative References
 
    [I-D.draft-ietf-oauth-security-topics]
               Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
@@ -247,6 +280,11 @@ Table of Contents
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986, DOI 10.17487/RFC3986, January 2005,
+              <https://www.rfc-editor.org/rfc/rfc3986>.
 
    [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
               RFC 6749, DOI 10.17487/RFC6749, October 2012,
@@ -266,9 +304,26 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
+7.2.  Informative References
+
+   [IndieAuth]
+              "IndieAuth", n.d., <https://indieauth.spec.indieweb.org/>.
+
+   [Solid-OIDC]
+              Coburn, A., elf Pavlik, and D. Zagidulin, "Solid-OIDC", 28
+              March 2022,
+              <https://solidproject.org/TR/2022/oidc-20220328>.
+
 Acknowledgments
 
-   TODO acknowledge.
+   The idea of using URIs as the client_id in OAuth based authorization
+   requests is not new, and has previously been specified in varying
+   ways by [IndieAuth] and [Solid-OIDC].  This specification is largely
+   inspired by the work of Aaron Coburn, elf Pavlik, and Dmitri
+   Zagidulin in their [Solid-OIDC] specification which defined
+   dereferenceable Client Identifier Documents.
+
+   TODO further acknowledgements?
 
 Authors' Addresses
 
@@ -280,3 +335,4 @@ Authors' Addresses
 
    Emelia Smith
    Email: emelia@brandedcode.com
+   URI:   https://thisismissem.social
