@@ -5,7 +5,7 @@
 Web Authorization Protocol                                    A. Parecki
 Internet-Draft                                                      Okta
 Intended status: Informational                                  E. Smith
-Expires: 24 November 2024                                    23 May 2024
+Expires: 2 December 2024                                     31 May 2024
 
 
                    OAuth Client ID Metadata Document
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 November 2024.
+   This Internet-Draft will expire on 2 December 2024.
 
 Copyright Notice
 
@@ -275,6 +275,7 @@ Authors' Addresses
    Aaron Parecki
    Okta
    Email: aaron@parecki.com
+   URI:   https://aaronparecki.com
 
 
    Emelia Smith
