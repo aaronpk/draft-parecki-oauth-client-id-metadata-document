@@ -307,7 +307,14 @@ Table of Contents
 7.2.  Informative References
 
    [IndieAuth]
-              "IndieAuth", n.d., <https://indieauth.spec.indieweb.org/>.
+              Parecki, A., "IndieAuth", 12 February 2022,
+              <https://indieauth.spec.indieweb.org/>.
+
+   [OpenID.Federation]
+              Hedberg, R., Jones, M.B., Solberg, A.Å., Bradley, J.,
+              Marco, G. D., and V. Dzhuvinov, "OpenID Federation 1.0",
+              17 May 2024,
+              <https://openid.net/specs/openid-federation-1_0.html>.
 
    [Solid-OIDC]
               Coburn, A., elf Pavlik, and D. Zagidulin, "Solid-OIDC", 28
@@ -318,10 +325,10 @@ Acknowledgments
 
    The idea of using URIs as the client_id in OAuth based authorization
    requests is not new, and has previously been specified in varying
-   ways by [IndieAuth] and [Solid-OIDC].  This specification is largely
-   inspired by the work of Aaron Coburn, elf Pavlik, and Dmitri
-   Zagidulin in their [Solid-OIDC] specification which defined
-   dereferenceable Client Identifier Documents.
+   ways by [IndieAuth], [Solid-OIDC], and [OpenID.Federation].  This
+   specification is largely inspired by the work of Aaron Coburn, elf
+   Pavlik, and Dmitri Zagidulin in their [Solid-OIDC] specification
+   which defined dereferenceable Client Identifier Documents.
 
    TODO further acknowledgements?
 
