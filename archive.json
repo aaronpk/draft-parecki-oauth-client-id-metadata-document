@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-05-30T00:27:23.231046+00:00",
+  "timestamp": "2024-06-02T00:29:46.756823+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -49,35 +49,70 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOL_Xevs6KwO1L",
+      "title": "Caching recommendations for the metadata document",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/3",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-metadata-caching\r\n\r\nProbably makes sense to respect the HTTP cache headers from the metadata URL.\r\n\r\nThe AS should probably also have its own min/max cache lifetime policy. Not sure if we want to recommend something explicit here though since it might depend on the particular deployment.",
+      "createdAt": "2024-05-31T13:56:13Z",
+      "updatedAt": "2024-05-31T13:56:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOL_Xevs6KwQmr",
+      "title": "need more warnings about OAuth phishing attacks",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/4",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-oauth-phishing-attacks\r\n\r\nThis section should be more explicit about the dangers of app impersonation through the metadata document.\r\n\r\nFor example, a client hosting a metadata document at `https://goooooooogle.com/metadata` could put an app name and logo icon of \"Google Docs\" in the metadata, impersonating a client that is actually `https://google.com/metadata`, potentially leading to authorizing the wrong client.\r\n\r\nWe should place a stronger recommendation around displaying the hostname of the actual `client_id` to the end user to help prevent this kind of phishing.",
+      "createdAt": "2024-05-31T13:58:55Z",
+      "updatedAt": "2024-05-31T13:58:55Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
       "id": "PR_kwDOL_Xevs5wl96g",
       "title": "Fix yaml frontmatter & prevent prettier from running",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/1",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Was starting to work on the draft, and was having compiling errors due to the yaml frontmatter having been incorrectly formatted by prettier (it really chokes on it), and the `url` property should've been `uri` from what I can tell.",
       "createdAt": "2024-05-26T16:03:37Z",
-      "updatedAt": "2024-05-26T16:26:20Z",
+      "updatedAt": "2024-05-31T13:46:58Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "744111c3933074752580695018742b0811838636",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "fix/prettier-and-yaml-frontmatter",
       "headRefOid": "37f38982d8ecfa22c55be6aa0766918977829544",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2024-05-31T13:46:58Z",
+      "mergedAt": "2024-05-31T13:46:58Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "a9f57bdae4aa77069cb1856e49478d2a7e90f500"
+      },
       "comments": [
         {
           "author": "ThisIsMissEm",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "One thing I wasn't sure of is what the word-wrapping line length should be on this document? It'd be good to also specify this in the `.editorconfig`",
           "createdAt": "2024-05-26T16:26:19Z",
           "updatedAt": "2024-05-26T16:26:19Z"
@@ -90,25 +125,35 @@
       "id": "PR_kwDOL_Xevs5wmFhI",
       "title": "Suggested improvements",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/2",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "This is based on #1, but otherwise has a few language and spelling changes; Additionally:\r\n- added the section about the restriction on the `client_id` property strictly matching the client metadata document's URI\r\n- added recommendation to use a stable URL (I'm not sure if there's a spec to refer to, but it'd be bad practice to, for example, include a version number in the URL for cache busting purposes even though the contents of the document has not actually changed.\r\n- added TBD about possible verification endpoint (i.e., giving developers an easy way to verify their document is valid (or perhaps a mechanism to invalidate a previously cached document?)\r\n- added language to allow extensions to the client metadata document, and allowing it to be served as content types other than just `application/json`, e.g., `application/ld+json`\r\n- moved caching up to beneath errors, as to allow language to easily flow about requirements not to cache error responses or invalid documents.\r\n- added TBD question on the redirect URI matching and whether it is exact string matching or simple string comparison (the original language).\r\n- tried to use `client metadata document` more consistently.",
       "createdAt": "2024-05-26T17:00:57Z",
-      "updatedAt": "2024-05-26T17:32:08Z",
+      "updatedAt": "2024-05-31T14:23:13Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "744111c3933074752580695018742b0811838636",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "suggested-improvements",
       "headRefOid": "5f8f9354b8982b38f98f52a69f366264f1f1fc28",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2024-05-31T13:54:59Z",
+      "mergedAt": "2024-05-31T13:54:59Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "ddd890557d6b4a6b4f4834f2a9cf0b46e4dcc6a5"
+      },
+      "comments": [
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "This is great, thanks. I'm going to merge it and open a few issues based on things I see here rather than hold up the merge.",
+          "createdAt": "2024-05-31T13:54:56Z",
+          "updatedAt": "2024-05-31T13:54:56Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOL_Xevs579mLh",
@@ -116,7 +161,7 @@
             "abbreviatedOid": "095163b"
           },
           "author": "ThisIsMissEm",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-26T17:01:42Z",
@@ -136,7 +181,7 @@
             "abbreviatedOid": "095163b"
           },
           "author": "ThisIsMissEm",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-26T17:04:32Z",
@@ -156,7 +201,7 @@
             "abbreviatedOid": "095163b"
           },
           "author": "ThisIsMissEm",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-26T17:05:42Z",
@@ -176,7 +221,7 @@
             "abbreviatedOid": "095163b"
           },
           "author": "ThisIsMissEm",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-26T17:21:34Z",
@@ -187,6 +232,46 @@
               "body": "I'm not sure if I have the language here correct. But basically the idea is that authorization servers may reject specific client types or mandate that certain standard properties must be present and have a given value.",
               "createdAt": "2024-05-26T17:21:34Z",
               "updatedAt": "2024-05-26T17:21:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs58oIdN",
+          "commit": {
+            "abbreviatedOid": "5f8f935"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T13:53:15Z",
+          "updatedAt": "2024-05-31T13:53:15Z",
+          "comments": [
+            {
+              "originalPosition": 158,
+              "body": "Maybe the AS should respect the HTTP cache headers that the client returns from the URL? Probably the AS should also have its own min/max cache lifetimes based on its own requirements as well.",
+              "createdAt": "2024-05-31T13:53:15Z",
+              "updatedAt": "2024-05-31T13:53:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs58oeH3",
+          "commit": {
+            "abbreviatedOid": "5f8f935"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T14:23:13Z",
+          "updatedAt": "2024-05-31T14:23:13Z",
+          "comments": [
+            {
+              "originalPosition": 158,
+              "body": "I was maybe thinking etags / if-unmodified-since type headers? I'm really not sure",
+              "createdAt": "2024-05-31T14:23:13Z",
+              "updatedAt": "2024-05-31T14:23:13Z"
             }
           ]
         }
