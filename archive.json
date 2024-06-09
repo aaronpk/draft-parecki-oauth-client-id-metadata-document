@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-06T00:27:20.391964+00:00",
+  "timestamp": "2024-06-09T00:31:14.795769+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -78,7 +78,61 @@
       "labels": [],
       "body": "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-oauth-phishing-attacks\r\n\r\nThis section should be more explicit about the dangers of app impersonation through the metadata document.\r\n\r\nFor example, a client hosting a metadata document at `https://goooooooogle.com/metadata` could put an app name and logo icon of \"Google Docs\" in the metadata, impersonating a client that is actually `https://google.com/metadata`, potentially leading to authorizing the wrong client.\r\n\r\nWe should place a stronger recommendation around displaying the hostname of the actual `client_id` to the end user to help prevent this kind of phishing.",
       "createdAt": "2024-05-31T13:58:55Z",
-      "updatedAt": "2024-05-31T13:58:55Z",
+      "updatedAt": "2024-06-07T19:21:45Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Aren't there also some phishing attacks risks when allowing the redirect_uris to be on any domain? If a client does not properly encode the `state` param (like they should!), they could interpret a redirection that was initiated by an attacker as a legitimate authorization callback.",
+          "createdAt": "2024-06-07T13:32:08Z",
+          "updatedAt": "2024-06-07T13:32:08Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "The approach towards which I'm leaning is to require the client_uri to be the \"parent\" url of the `client_id` (the same url but without the last path segment and no query string), and require that all `redirect_uris` start with `<client_uri>/`.\r\n\r\nAlso, we don't plan on showing the `icon_uri` for unknown clients. We might put in place a mechanism to allow devs to add their clients to the allow listed clients.",
+          "createdAt": "2024-06-07T14:14:20Z",
+          "updatedAt": "2024-06-07T14:14:20Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> The approach towards which I'm leaning is to require the client_uri to be the \"parent\" url of the `client_id` (the same url but without the last path segment and no query string), and require that all `redirect_uris` start with `<client_uri>/`.\r\n> \r\n> Also, we don't plan on showing the `icon_uri` for unknown clients. We might put in place a mechanism to allow devs to add their clients to the allow listed clients.\r\n\r\nThat breaks custom app redirect protocols",
+          "createdAt": "2024-06-07T19:21:44Z",
+          "updatedAt": "2024-06-07T19:21:44Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOL_Xevs6Lb2P_",
+      "title": "Compare & contrast with draft-looker-oauth-client-discovery",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/5",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://www.ietf.org/archive/id/draft-looker-oauth-client-discovery-01.html\r\n\r\nThese a similar, but that I-D uses bare hostnames with a well-known path, instead of any URL that points to a JSON document, as in ours.",
+      "createdAt": "2024-06-07T00:00:27Z",
+      "updatedAt": "2024-06-07T00:00:27Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOL_Xevs6LkZBk",
+      "title": "Add property to oauth-authorization-server to indicate client_id as URIs is supported",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/6",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently there is no way of knowing \"does this target IdP / AS support client_id's as URIs?\"\r\n\r\nWhich prevents applications from downgrading nicely, instead they'd issue the redirect and the user would be met with \"No such application exists for client_id\" type error.\r\n\r\ni'd suggest we add an extension to RFC8414's metadata document that helps indicate if client_ids as URIs is supported (could this be limited by confidentiality?)",
+      "createdAt": "2024-06-08T09:36:02Z",
+      "updatedAt": "2024-06-08T09:36:36Z",
       "closedAt": null,
       "comments": []
     }
