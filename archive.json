@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-09T00:31:14.795769+00:00",
+  "timestamp": "2024-06-11T00:27:45.092196+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -78,7 +78,7 @@
       "labels": [],
       "body": "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-oauth-phishing-attacks\r\n\r\nThis section should be more explicit about the dangers of app impersonation through the metadata document.\r\n\r\nFor example, a client hosting a metadata document at `https://goooooooogle.com/metadata` could put an app name and logo icon of \"Google Docs\" in the metadata, impersonating a client that is actually `https://google.com/metadata`, potentially leading to authorizing the wrong client.\r\n\r\nWe should place a stronger recommendation around displaying the hostname of the actual `client_id` to the end user to help prevent this kind of phishing.",
       "createdAt": "2024-05-31T13:58:55Z",
-      "updatedAt": "2024-06-07T19:21:45Z",
+      "updatedAt": "2024-06-10T11:58:54Z",
       "closedAt": null,
       "comments": [
         {
@@ -101,6 +101,41 @@
           "body": "> The approach towards which I'm leaning is to require the client_uri to be the \"parent\" url of the `client_id` (the same url but without the last path segment and no query string), and require that all `redirect_uris` start with `<client_uri>/`.\r\n> \r\n> Also, we don't plan on showing the `icon_uri` for unknown clients. We might put in place a mechanism to allow devs to add their clients to the allow listed clients.\r\n\r\nThat breaks custom app redirect protocols",
           "createdAt": "2024-06-07T19:21:44Z",
           "updatedAt": "2024-06-07T19:21:44Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Yeah, I'm only doing this for HTTP based uris.",
+          "createdAt": "2024-06-10T07:00:15Z",
+          "updatedAt": "2024-06-10T07:00:15Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "This would also break HTTP cases where you want the app at `https://app.myservice.example` but the marketing/about site is `https://myservice.example`",
+          "createdAt": "2024-06-10T07:23:22Z",
+          "updatedAt": "2024-06-10T07:23:22Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "In the case of BlueSky, you could also extend the metadata you store to include one of your bluesky DIDs, which would be used in preference over `icon_uri`, and if that client metadata document were then used against say, a mastodon server, then it'd just ignore the additional property it doesn't understand ",
+          "createdAt": "2024-06-10T07:26:37Z",
+          "updatedAt": "2024-06-10T07:26:37Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "I realize now that adding restrictions on the `client_uri` or `redirect_uris` is probably worthless, as these could indeed be \"valid\" (wrt to those restrictions) while performing a 3xx redirect when visited.\r\n\r\nRegarding the icon, I am not sure how using an account's profile picture (through its DID) would allow avoiding impersonation of well established companies.",
+          "createdAt": "2024-06-10T09:12:14Z",
+          "updatedAt": "2024-06-10T09:12:14Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "It wouldn't necessarily prevent, but you'd have an on-platform identity linked which could then help with moderation ",
+          "createdAt": "2024-06-10T11:58:53Z",
+          "updatedAt": "2024-06-10T11:58:53Z"
         }
       ]
     },
