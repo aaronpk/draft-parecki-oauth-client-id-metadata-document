@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-13T00:27:39.740184+00:00",
+  "timestamp": "2024-06-16T00:30:37.382071+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -168,6 +168,101 @@
       "body": "Currently there is no way of knowing \"does this target IdP / AS support client_id's as URIs?\"\r\n\r\nWhich prevents applications from downgrading nicely, instead they'd issue the redirect and the user would be met with \"No such application exists for client_id\" type error.\r\n\r\ni'd suggest we add an extension to RFC8414's metadata document that helps indicate if client_ids as URIs is supported (could this be limited by confidentiality?)",
       "createdAt": "2024-06-08T09:36:02Z",
       "updatedAt": "2024-06-08T09:36:36Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOL_Xevs6ML7vn",
+      "title": "Exclude `client_secret_*` values from `token_endpoint_auth_method`",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/7",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "We should prohibit any `client_secret_*` values in the `token_endpoint_auth_method` for client metadata. \r\n\r\nhttps://www.rfc-editor.org/rfc/rfc7591#section-2",
+      "createdAt": "2024-06-13T19:49:22Z",
+      "updatedAt": "2024-06-13T20:44:45Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "that's what Solid OIDC does by mandating that `token_endpoint_auth_method` must be `none` \u2014 are there any other `token_endpoint_auth_method`s that exist besides those for client credentials?",
+          "createdAt": "2024-06-13T20:30:36Z",
+          "updatedAt": "2024-06-13T20:30:36Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Yes, RFC7523 defines a [JWT profile for client authentication](https://www.rfc-editor.org/rfc/rfc7523#section-2.2), commonly referred to as `private_key_jwt`. I already have [a note in the draft](https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-public-vs-confidential-clie) about using this, but probably need to change that section header. \r\n\r\nThere's also [RFC8705 Mutual TLS](https://datatracker.ietf.org/doc/html/rfc8705), but I would not recommend that for this scenario.\r\n\r\nThe registry of token endpoint authentication methods is here: https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method",
+          "createdAt": "2024-06-13T20:42:47Z",
+          "updatedAt": "2024-06-13T20:44:45Z"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOL_Xevs6ML_XS",
+      "title": "Expand public/confidential client considerations",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/8",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "While this draft doesn't change anything about public/confidential client considerations, it might still be helpful to include pointers to other OAuth specs that discuss some considerations such as limiting the refresh token lifetime and prompting the user for consent more frequently.",
+      "createdAt": "2024-06-13T19:59:16Z",
+      "updatedAt": "2024-06-13T19:59:16Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOL_Xevs6MMAsX",
+      "title": "Add a recommendation to set a max size for the expected HTTP response when fetching client metadata",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/9",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-06-13T20:02:59Z",
+      "updatedAt": "2024-06-13T20:03:00Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOL_Xevs6MMGh2",
+      "title": "Consider requiring that the `client_uri` is a prefix of the `client_id`",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/10",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The `client_uri` value is meant to point to a web page about the client. The `client_id` is the JSON metadata. So it would be reasonable for someone to implement this with values such as:\r\n\r\n```json\r\n{\r\n  \"client_id\": \"https://example.com/metadata.json\",\r\n  \"client_uri\": \"https://example.com/\"\r\n}\r\n```\r\n\r\nRequiring that the `client_uri` is a prefix means we can recommend displaying that whole value to the user, rather than only the hostname (more risky in shared domain situations) or the full `client_id` (more noisy with the potential for long strings that might scare the user)",
+      "createdAt": "2024-06-13T20:19:06Z",
+      "updatedAt": "2024-06-13T20:19:06Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 11,
+      "id": "I_kwDOL_Xevs6MMHoW",
+      "title": "What should the AS do when it notices a client has changed its keys",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/11",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "For a client that has a registered JWKS, what should the AS do (if anything), when it notices the keys changed? Keys could change for multiple reasons:\r\n\r\n* The client is proactively rotating its keys\r\n* A client key was compromised\r\n",
+      "createdAt": "2024-06-13T20:22:14Z",
+      "updatedAt": "2024-06-13T20:22:14Z",
       "closedAt": null,
       "comments": []
     }
