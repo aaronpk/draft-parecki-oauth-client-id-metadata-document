@@ -181,6 +181,15 @@ registered redirect URI with the authorization server which is used when
 comparing the redirect URI in an authorization request against the registered
 redirect URIs.
 
+# Authorization Server Metadata {#as-metadata}
+
+Authorization servers that publish Authorization Server Metadata {{RFC8414}} MUST include the following property to signal support for client metadata documents as described in this specification.
+
+`client_id_metadata_document_supported`:
+: OPTIONAL. Boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL as described in this specification.
+
+This enables clients to avoid sending the user to a dead end, by only redirecting the user to an authorization server that supports this specification. Otherwise, the client would redirect the user and the user would be met with an error about an invalid client as described by Section 4.1.2.1 of {{RFC6749}}.
+
 
 # Security Considerations
 
@@ -222,7 +231,15 @@ Authorization servers fetching the client metadata document and resolving URLs l
 
 # IANA Considerations
 
-This document has no IANA actions.
+## OAuth Authorization Server Metadata Registry
+
+The following authorization server metadata value is defined by this specification and registered in the IANA "OAuth Authorization Server Metadata" registry established in OAuth 2.0 Authorization Server Metadata [RFC8414].
+
+* Metadata Name: `client_id_metadata_document_supported`:
+* Metadata Description: JSON boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL.
+* Change Controller: IETF
+* Specification Document: {{as-metadata}} of [[ this document ]]
+
 
 
 --- back
