@@ -277,7 +277,7 @@ The authors would like to thank the following people for their contributions and
 
 [[ To be removed from the final specification ]]
 
-- 00
+-00
 
 * Initial draft
 
