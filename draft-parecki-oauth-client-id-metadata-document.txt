@@ -5,7 +5,7 @@
 Web Authorization Protocol                                    A. Parecki
 Internet-Draft                                                      Okta
 Intended status: Informational                                  E. Smith
-Expires: 2 December 2024                                     31 May 2024
+Expires: 3 January 2025                                      2 July 2024
 
 
                    OAuth Client ID Metadata Document
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 December 2024.
+   This Internet-Draft will expire on 3 January 2025.
 
 Copyright Notice
 
@@ -82,14 +82,16 @@ Table of Contents
      4.2.  Metadata Discovery Errors
      4.3.  Metadata Caching
      4.4.  Redirect URL Registration
-   5.  Security Considerations
-     5.1.  Public vs Confidential Clients
-     5.2.  OAuth Phishing Attacks
-     5.3.  Server Side Request Forgery (SSRF) Attacks
-   6.  IANA Considerations
-   7.  References
-     7.1.  Normative References
-     7.2.  Informative References
+   5.  Authorization Server Metadata
+   6.  Security Considerations
+     6.1.  Client Authentication
+     6.2.  OAuth Phishing Attacks
+     6.3.  Server Side Request Forgery (SSRF) Attacks
+   7.  IANA Considerations
+     7.1.  OAuth Authorization Server Metadata Registry
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -162,6 +164,11 @@ Table of Contents
    specific content types as long as the response is JSON and conforms
    to application/<AS-defined>+json.
 
+   The token_endpoint_auth_method property MUST NOT include
+   client_secret_post or client_secret_basic, as there is no way to
+   establish a shared secret to be used with these authentication
+   methods.  See Section 6.1 for more details.
+
    Other specifications MAY place additional restrictions on the
    contents of the client metadata document accepted by authorization
    servers implementing their specification, for instance, preventing
@@ -191,23 +198,40 @@ Table of Contents
 4.4.  Redirect URL Registration
 
    According to [I-D.draft-ietf-oauth-security-topics], the
-   authorization server MUST require registration of redirect URLs, and
-   compare redirect URLs with exact string matching.  This client
-   information discovery establishes a registered redirect URL with the
-   authorization server which is used when comparing the redirect URL in
-   an authorization request against the registered redirect URLs.
+   authorization server MUST require registration of redirect URIs, and
+   MUST ensure that the redirect URI in a request is an exact match of a
+   registered redirect URI.
 
-   TBD: Is it exact string matching, or is it still using simple string
-   comparison per [RFC3986]
+   This method of client information discovery establishes a registered
+   redirect URI with the authorization server which is used when
+   comparing the redirect URI in an authorization request against the
+   registered redirect URIs.
 
-5.  Security Considerations
+5.  Authorization Server Metadata
+
+   Authorization servers that publish Authorization Server Metadata
+   [RFC8414] MUST include the following property to signal support for
+   client metadata documents as described in this specification.
+
+   client_id_metadata_document_supported:  OPTIONAL.  Boolean value
+      specifying whether the authorization server supports retrieving
+      client metadata from a client_id URL as described in this
+      specification.
+
+   This enables clients to avoid sending the user to a dead end, by only
+   redirecting the user to an authorization server that supports this
+   specification.  Otherwise, the client would redirect the user and the
+   user would be met with an error about an invalid client as described
+   by Section 4.1.2.1 of [RFC6749].
+
+6.  Security Considerations
 
    In addition to the security considerations in OAuth 2.0 Core
    [RFC6749], and OAuth 2.0 Threat Model and Security Considerations
    [RFC6819], and [I-D.draft-ietf-oauth-security-topics] the additional
    considerations apply.
 
-5.1.  Public vs Confidential Clients
+6.1.  Client Authentication
 
    Since the client establishes its own registration data at the
    authorization server, prior coordination of client credentials is not
@@ -218,7 +242,7 @@ Table of Contents
 
    For example, the client MAY include the following properties in its
    metadata document to establish a public key and the private_key_jwt
-   authentication method:
+   authentication method defined in [OpenID]:
 
    {
      ...
@@ -231,7 +255,7 @@ Table of Contents
    communication with the authorization server MUST include client
    authentication of the registered type.
 
-5.2.  OAuth Phishing Attacks
+6.2.  OAuth Phishing Attacks
 
    Authorization servers SHOULD fetch the client_id metadata document
    provided in the authorization request in order to provide users with
@@ -249,7 +273,7 @@ Table of Contents
    client_id URL is the only piece of information the user has as an
    indication of which application they are authorizing.
 
-5.3.  Server Side Request Forgery (SSRF) Attacks
+6.3.  Server Side Request Forgery (SSRF) Attacks
 
    Authorization servers fetching the client metadata document and
    resolving URLs located in the metadata document should be aware of
@@ -260,21 +284,36 @@ Table of Contents
    possibility that URLs might be non-http-based URI schemes which can
    lead to other possible SSRF attack vectors.
 
-6.  IANA Considerations
+7.  IANA Considerations
 
-   This document has no IANA actions.
+7.1.  OAuth Authorization Server Metadata Registry
 
-7.  References
+   The following authorization server metadata value is defined by this
+   specification and registered in the IANA "OAuth Authorization Server
+   Metadata" registry established in OAuth 2.0 Authorization Server
+   Metadata [RFC8414].
 
-7.1.  Normative References
+   *  Metadata Name: client_id_metadata_document_supported:
+
+   *  Metadata Description: JSON boolean value specifying whether the
+      authorization server supports retrieving client metadata from a
+      client_id URL.
+
+   *  Change Controller: IETF
+
+   *  Specification Document: Section 5 of [[ this document ]]
+
+8.  References
+
+8.1.  Normative References
 
    [I-D.draft-ietf-oauth-security-topics]
               Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
               "OAuth 2.0 Security Best Current Practice", Work in
               Progress, Internet-Draft, draft-ietf-oauth-security-
-              topics-27, 7 May 2024,
+              topics-29, 3 June 2024,
               <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
-              security-topics-27>.
+              security-topics-29>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -304,11 +343,21 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-7.2.  Informative References
+   [RFC8414]  Jones, M., Sakimura, N., and J. Bradley, "OAuth 2.0
+              Authorization Server Metadata", RFC 8414,
+              DOI 10.17487/RFC8414, June 2018,
+              <https://www.rfc-editor.org/rfc/rfc8414>.
+
+8.2.  Informative References
 
    [IndieAuth]
               Parecki, A., "IndieAuth", 12 February 2022,
               <https://indieauth.spec.indieweb.org/>.
+
+   [OpenID]   Sakimura, N., Bradley, J., Jones, M., Medeiros, B. de.,
+              and C. Mortimore, "OpenID Connect Core 1.0", 15 December
+              2023,
+              <https://openid.net/specs/openid-connect-core-1_0.html>.
 
    [OpenID.Federation]
               Hedberg, R., Jones, M.B., Solberg, A.Å., Bradley, J.,
