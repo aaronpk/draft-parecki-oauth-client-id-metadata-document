@@ -34,6 +34,7 @@ normative:
   RFC6749:
   RFC6819:
   RFC7591:
+  RFC8414:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
@@ -54,6 +55,21 @@ informative:
       - name: elf Pavlik
         ins: elf Pavlik
       - name: Dmitri Zagidulin
+  OpenID:
+    title: "OpenID Connect Core 1.0"
+    date: 2023-12-15
+    target: https://openid.net/specs/openid-connect-core-1_0.html
+    author:
+      - name: N. Sakimura
+        org: NAT.Consulting
+      - name: J. Bradley
+        org: Yubico
+      - name: M. Jones
+        org: Self-Issued Consulting
+      - name: B. de Medeiros
+        org: Google
+      - name: C. Mortimore
+        org: Disney
   OpenID.Federation:
     title: "OpenID Federation 1.0"
     date: 2024-05-17
