@@ -146,6 +146,10 @@ The client metadata document MAY define additional properties in the response.
 The client metadata document MAY also be served with more specific content types
 as long as the response is JSON and conforms to `application/<AS-defined>+json`.
 
+The `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
+or `client_secret_basic`, as there is no way to establish a shared secret to be
+used with these authentication methods. See {{client_authentication}} for more details.
+
 Other specifications MAY place additional restrictions on the contents of the
 client metadata document accepted by authorization servers implementing their
 specification, for instance, preventing the registration of confidential clients
@@ -195,7 +199,7 @@ This enables clients to avoid sending the user to a dead end, by only redirectin
 
 In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{I-D.draft-ietf-oauth-security-topics}} the additional considerations apply.
 
-## Public vs Confidential Clients
+## Client Authentication {#client_authentication}
 
 Since the client establishes its own registration data at the authorization server,
 prior coordination of client credentials is not possible. However, clients MAY establish
@@ -203,7 +207,7 @@ credentials at the authorization server by using authentication methods that use
 public/private key pairs, by publishing the public key in their metadata document.
 
 For example, the client MAY include the following properties in its metadata document
-to establish a public key and the `private_key_jwt` authentication method:
+to establish a public key and the `private_key_jwt` authentication method defined in {{OpenID}}:
 
     {
       ...
