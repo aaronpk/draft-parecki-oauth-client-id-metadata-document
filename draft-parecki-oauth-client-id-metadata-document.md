@@ -173,13 +173,13 @@ is valid?
 ## Redirect URL Registration
 
 According to {{I-D.draft-ietf-oauth-security-topics}}, the authorization server
-MUST require registration of redirect URLs, and compare redirect URLs with
-exact string matching. This client information discovery establishes a
-registered redirect URL with the authorization server which is used when
-comparing the redirect URL in an authorization request against the registered
-redirect URLs.
+MUST require registration of redirect URIs, and MUST ensure that the redirect URI
+in a request is an exact match of a registered redirect URI.
 
-TBD: Is it exact string matching, or is it still using simple string comparison per [RFC3986]
+This method of client information discovery establishes a
+registered redirect URI with the authorization server which is used when
+comparing the redirect URI in an authorization request against the registered
+redirect URIs.
 
 
 # Security Considerations
