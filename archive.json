@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-02T00:28:06.934217+00:00",
+  "timestamp": "2024-07-04T00:27:55.571720+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -160,15 +160,15 @@
       "id": "I_kwDOL_Xevs6LkZBk",
       "title": "Add property to oauth-authorization-server to indicate client_id as URIs is supported",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/6",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ThisIsMissEm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Currently there is no way of knowing \"does this target IdP / AS support client_id's as URIs?\"\r\n\r\nWhich prevents applications from downgrading nicely, instead they'd issue the redirect and the user would be met with \"No such application exists for client_id\" type error.\r\n\r\ni'd suggest we add an extension to RFC8414's metadata document that helps indicate if client_ids as URIs is supported (could this be limited by confidentiality?)",
       "createdAt": "2024-06-08T09:36:02Z",
-      "updatedAt": "2024-06-08T09:36:36Z",
-      "closedAt": null,
+      "updatedAt": "2024-07-02T20:58:58Z",
+      "closedAt": "2024-07-02T20:58:58Z",
       "comments": []
     },
     {
@@ -176,15 +176,15 @@
       "id": "I_kwDOL_Xevs6ML7vn",
       "title": "Exclude `client_secret_*` values from `token_endpoint_auth_method`",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/7",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "aaronpk",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "We should prohibit any `client_secret_*` values in the `token_endpoint_auth_method` for client metadata. \r\n\r\nhttps://www.rfc-editor.org/rfc/rfc7591#section-2",
       "createdAt": "2024-06-13T19:49:22Z",
-      "updatedAt": "2024-06-13T20:44:45Z",
-      "closedAt": null,
+      "updatedAt": "2024-07-02T21:04:33Z",
+      "closedAt": "2024-07-02T21:04:33Z",
       "comments": [
         {
           "author": "ThisIsMissEm",
@@ -263,6 +263,22 @@
       "body": "For a client that has a registered JWKS, what should the AS do (if anything), when it notices the keys changed? Keys could change for multiple reasons:\r\n\r\n* The client is proactively rotating its keys\r\n* A client key was compromised\r\n",
       "createdAt": "2024-06-13T20:22:14Z",
       "updatedAt": "2024-06-13T20:22:14Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 12,
+      "id": "I_kwDOL_Xevs6OXKPl",
+      "title": "Support for localhost & non-HTTPS URIs for development purposes?",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/12",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We've currently a restriction for `client_id` URIs that they MUST be https scheme. \r\n\r\nIn development environments where all software is running on localhost, we should probably provide an exception to that rule, given the issues that can be faced (self-signed certificates, custom root certificates, etc) with settings up HTTPS in development.",
+      "createdAt": "2024-07-03T11:53:42Z",
+      "updatedAt": "2024-07-03T11:53:42Z",
       "closedAt": null,
       "comments": []
     }
