@@ -88,6 +88,9 @@ informative:
       - name: V. Dzhuvinov
         org: Connect2id
 
+entity:
+  SELF: "[draft-parecki-oauth-client-id-metadata-document-latest]"
+
 --- abstract
 
 This specification defines a mechanism through which an OAuth client can
@@ -258,7 +261,7 @@ The following authorization server metadata value is defined by this specificati
 * Metadata Name: `client_id_metadata_document_supported`:
 * Metadata Description: JSON boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL.
 * Change Controller: IETF
-* Specification Document: {{as-metadata}} of [[ this document ]]
+* Specification Document: {{as-metadata}} of {{&SELF}}
 
 
 
@@ -275,7 +278,7 @@ The authors would like to thank the following people for their contributions and
 # Document History
 {:numbered="false"}
 
-[[ To be removed from the final specification ]]
+(This appendix to be deleted by the RFC editor in the final specification.)
 
 -00
 
