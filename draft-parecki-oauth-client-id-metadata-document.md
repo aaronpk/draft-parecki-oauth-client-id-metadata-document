@@ -252,6 +252,11 @@ If fetching the client metadata document fails for any reason, the `client_id` U
 Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers SHOULD avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers SHOULD also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.
 
 
+## Maximum Response Size for Client Metadata Documents
+
+Authorization servers SHOULD limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.
+
+
 # IANA Considerations
 
 ## OAuth Authorization Server Metadata Registry
