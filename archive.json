@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-04T00:27:55.571720+00:00",
+  "timestamp": "2024-07-07T00:31:27.485313+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -246,9 +246,45 @@
       "labels": [],
       "body": "The `client_uri` value is meant to point to a web page about the client. The `client_id` is the JSON metadata. So it would be reasonable for someone to implement this with values such as:\r\n\r\n```json\r\n{\r\n  \"client_id\": \"https://example.com/metadata.json\",\r\n  \"client_uri\": \"https://example.com/\"\r\n}\r\n```\r\n\r\nRequiring that the `client_uri` is a prefix means we can recommend displaying that whole value to the user, rather than only the hostname (more risky in shared domain situations) or the full `client_id` (more noisy with the potential for long strings that might scare the user)",
       "createdAt": "2024-06-13T20:19:06Z",
-      "updatedAt": "2024-06-13T20:19:06Z",
+      "updatedAt": "2024-07-05T20:02:22Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "This would complicate something like a development client_id metadata document provider, which would hinder developer experience getting started with using client_id metadata documents. See also #12 ",
+          "createdAt": "2024-07-05T15:35:12Z",
+          "updatedAt": "2024-07-05T15:35:12Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Regarding #12, if we did have a \"metadata as a service\", think it would be reasonable to enforce that the `client_uri` be on the same origin/prefix. We don't want to hinder DX too much, but enforcing a prefix would push devs to publish their own metadata, which is desirable.",
+          "createdAt": "2024-07-05T16:59:35Z",
+          "updatedAt": "2024-07-05T16:59:35Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@matthieusieben I think it could only be a \"SHOULD\" and not a \"MUST\" at best. So:\r\n\r\n> `client_uri` SHOULD be a prefix of `client_id`\r\n\r\nUnless the \"client metadata document as a service\" server has some way of generating a page for `client_uri`? Or we make it a MUST but allow for omission of the `client_uri`?",
+          "createdAt": "2024-07-05T18:57:35Z",
+          "updatedAt": "2024-07-05T18:57:35Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "There's also language in the [dynamic client registration RFC](https://www.rfc-editor.org/rfc/rfc7591.html) about `client_uri`, `tos_uri`, `policy_uri` and `logo_uri`:\r\n\r\n> In a situation where the authorization server is supporting open client registration, it must be extremely careful with any URL provided by the client that will be displayed to the user (e.g., \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\").  For instance, a rogue client could specify a registration request with a reference to a drive-by download in the \"policy_uri\", enticing the user to click on it during the authorization.  The authorization server SHOULD check to see if the \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\" have the same host and scheme as the those defined in the array of \"redirect_uris\" and that all of these URIs resolve to valid web pages.  Since these URI values that are intended to be displayed to the user at the authorization page, the authorization server SHOULD protect the user from malicious content hosted at the URLs where possible.  For instance, before presenting the URLs to the user at the authorization page, the authorization server could download the content hosted at the URLs, check the content against a malware scanner and blacklist filter, determine whether or not there is mixed secure and non-secure content at the URL, and other possible server-side mitigations.  Note that the content in these URLs can change at any time and the authorization server cannot provide complete confidence in the safety of the URLs, but these practices could help.  To further mitigate this kind of threat, the authorization server can also warn the user that the URL links have been provided by a third party, should be treated with caution, and are not hosted by the authorization server itself.  For instance, instead of providing the links directly in an HTML anchor, the authorization server can direct the user to an interstitial warning page before allowing the user to continue to the target URL.\r\n\r\nAs client metadata document support is effectively open client registration, perhaps we need a reminder of this under the security considerations?",
+          "createdAt": "2024-07-05T19:00:49Z",
+          "updatedAt": "2024-07-05T19:01:47Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Since the user comes from the client origin (can be checked through the `referer` header), and will navigate back to that same origin (redirect uri, tos, policy, etc), the oauth provider does not put the user in a position of risk, even if it does not scan the various uris against potential attacks, by simply enforcing a same origin policy on all the uris. Enforcing a same prefix policy allows to better yet protect users against different clients that would be hosted on some shared CDN (think Google buckets).\n\n\nIn our implementation, we do enforce a same prefix policy for that reason.\n\nIn the case of \"loopback clients\" (clients that do not host their own metadata document, we might need to come up with a name for those), we do not allow, or show, *any* uri, logo or name (besides `127.0.0.1` redirect uris). Even with clients that do expose their own metadata document, we keep an allowlist to determine if the logo can be shown.\n\nI strongly believe that:\n- the spec should require (MUST) that the various uris be on the same origin.\n- the spec should suggest (SHOULD) that the various uris be on the same prefix\n- the spec should require (MUST) not to display the logo without manual approval\n- the spec should suggest (SHOULD) display a warning in case of non allow listed clients (\"This client pretends to be X, but make sure that the <client_origin> is indeed owned by X before you continue\")\n- the spec should suggest (SHOULD) to add additional security measures for non allow listed clients (no SSO, refresh tokens limited to short period, etc)\n- any \"metadata document as a service\" should not allow using arbitrary/unverified origins in client uris. In particular it should not (MUST NOT) bypass the same origin policy by redirecting the user to an arbitrary uri (this should be more easy to enforce by the auth server than performing a malware scan)\n- \"loopback clients\" (client uri using `http://localhost`, or any other non HTTPS uri) offer a great way for authorization servers to detect clients marking themselves as potentially vulnerable to attacks (e.g. two apps running on the same computer, the second trying to impersonate the first by using the same metadata document)\n- \"loopback clients\" also allow each auth server to provide their own default in the metadata document (though this might be problematic for interoperability)\n\n\nFor all these reasons, I think that a same prefix policy, and an indentifiable \"loopback client\" uri scheme should really be specced.",
+          "createdAt": "2024-07-05T20:02:21Z",
+          "updatedAt": "2024-07-05T20:02:21Z"
+        }
+      ]
     },
     {
       "number": 11,
@@ -278,7 +314,52 @@
       "labels": [],
       "body": "We've currently a restriction for `client_id` URIs that they MUST be https scheme. \r\n\r\nIn development environments where all software is running on localhost, we should probably provide an exception to that rule, given the issues that can be faced (self-signed certificates, custom root certificates, etc) with settings up HTTPS in development.",
       "createdAt": "2024-07-03T11:53:42Z",
-      "updatedAt": "2024-07-03T11:53:42Z",
+      "updatedAt": "2024-07-05T14:34:10Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "At Bluesky, we actually have another use case in mind:\r\n\r\nAllow a dev that does not own/deployed a publicly available client metadata on the internet, to use a \"loopback client\" with a *production* server. In this case, what we do is we hard code the metadata in the authorization server, using query strings to allow customizing it.\r\n\r\ne.g. `http://localhost/?client_name=My%20app&redirect_uris=http%3A%2F%2F127.0.0.1%2Fcb` would be resolved by the authorization server into:\r\n\r\n```json\r\n{\r\n  \"client_id\": \"http://localhost/?client_name=My%20app&redirect_uris=http%3A%2F%2F127.0.0.1%2Fcb\",\r\n  \"client_name\": \"My app\",\r\n  \"redirect_uris\": [\"http://127.0.0.1/cb\"],\r\n  \"grant_types\": [\"authorization_code\", \"implicit\", \"refresh_token\"],\r\n  \"scope\": \"openid profile offline_access\",\r\n  \"token_endpoint_auth_method\": \"none\",\r\n  \"application_type\": \"native\",\r\n  \"dpop_bound_access_tokens\": true,\r\n}\r\n```\r\n\r\nNote that in this case, the authorization server adds other restrictions to the client, such as forbidding `prompt=none`, reducing the validity of tokens, not displaying images & links, etc. The authorization page basically reads \"A program on your device wants to get credentials for your account\".\r\n\r\nThis is our exact implementation:\r\nhttps://github.com/bluesky-social/atproto/blob/main/packages/oauth/oauth-types/src/atproto-loopback-client-metadata.ts",
+          "createdAt": "2024-07-05T07:42:17Z",
+          "updatedAt": "2024-07-05T07:48:58Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@matthieusieben the way we did this at Inrupt for working on Solid apps was to host a client_id at a temporary publicly accessible URL.\r\n\r\nThe other option is using something that exposes your localhost server to the public internet (which I'd not really recommend)\r\n\r\nThe reason for this is that the Authorization Server cannot access a localhost URL (without requesting to itself), so the URL of the client_id must resolve to a publicly accessible resource ",
+          "createdAt": "2024-07-05T10:20:52Z",
+          "updatedAt": "2024-07-05T10:20:52Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "We know about these solutions. And we also agree that this is what devs should ideally do.\r\n\r\nHowever, we believe it is critical for our business to make it as easy as possible for 3rd party devs to integrate with our systems, which is why we chose this approach. This is particularly important because we decided to adopt the current BCP, which impose a bunch of stuff (DPoP, PKCe, etc) that make OAuth client particularly difficult to implement. Having to expose a json file on the web is arguably quite simple, but we really want to cut any corner we can here.\r\n\r\nFor this reason, we:\r\n1) Do require Server Side Request Forgery protection to be in place on the OAuth Provider\r\n2) Add an exception for `localhost` to be interpreted as described\r\n\r\nI realize now that there is another solution that we did not envision; that is to offer a \"client metadata as a service\" endpoint that would use query params to build the client metadata.\r\n\r\nI guess that the use of the `localhost` hostname makes it clear to the authorization server that it is a particular type of client, and that additional restrictions should be applied.",
+          "createdAt": "2024-07-05T13:06:08Z",
+          "updatedAt": "2024-07-05T13:18:57Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> I realize now that there is another solution that we did not envision; that is to offer a \"client metadata as a service\" endpoint that would use query params to build the client metadata\r\n\r\nThis was something that the dev tools team I was on floated as an idea, but we went with writing a generator / validator as a project for @laurin-w \u2014 unfortunately product at inrupt killed the project after it was built.\r\n\r\nIf you do support a client_id metadata documents as a service system, I'd recommend limiting it only to localhost & private IP addresses, as to make it a development-only service, such that it can't compromise production systems.",
+          "createdAt": "2024-07-05T14:34:09Z",
+          "updatedAt": "2024-07-05T14:34:09Z"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "id": "I_kwDOL_Xevs6OoY5C",
+      "title": "Additional TLS Requirements under Security Considerations",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/13",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I was re-reading the [OAuth Authorization Server Metadata](https://datatracker.ietf.org/doc/html/rfc8414#section-6.1) RFC, and noted that it has a section on TLS Requirements. We already require HTTPS, is it worth expanding the Security Considerations to include a requirement such as \"the authorization server MUST perform a TLS/SSL server certificate check when requesting the client_id metadata document\", as is written in that specification?\r\n\r\n> Implementations MUST support TLS.  Which version(s) ought to be implemented will vary over time and depend on the widespread deployment and known security vulnerabilities at the time of implementation.  The authorization server MUST support TLS version 1.2 [RFC5246] and MAY support additional TLS mechanisms meeting its security requirements.  When using TLS, the client MUST perform a TLS/SSL server certificate check, per RFC 6125 [RFC6125]. Implementation security considerations can be found in \"Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)\" [BCP195].\r\n> \r\n> To protect against information disclosure and tampering, confidentiality protection MUST be applied using TLS with a ciphersuite that provides confidentiality and integrity protection.",
+      "createdAt": "2024-07-05T17:40:55Z",
+      "updatedAt": "2024-07-05T17:40:55Z",
       "closedAt": null,
       "comments": []
     }
@@ -476,6 +557,40 @@
           ]
         }
       ]
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOL_Xevs50jyAY",
+      "title": "Feat: Maximum response size for Client Metadata Documents",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/14",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I did some research through other OAuth related specifications and couldn't find any similar language. I'm unsure if we should set an absolute maximum, but I think a recommendation of 5 kilobytes is probably sufficient for almost all use cases.\r\n\r\nI think typically these documents are under 1kb in size.\r\n\r\nResolves #9 ",
+      "createdAt": "2024-07-05T18:29:10Z",
+      "updatedAt": "2024-07-05T20:18:00Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "4acdf4744b8ab91ab77a186e2bf1c1901e365219",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "feat/document-response-max-size",
+      "headRefOid": "8d46176b64b72b7a2db09c487019bbef1b50ae30",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "One thing that may drive up the size of a client metadata document is full localisation of localisable properties in the document, given that the IANA language subtag registry includes several thousand languages: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry\r\n\r\nSo maybe this limitation would actually be problematic, and we should just suggest something less than X megabytes, instead of kilobytes?\r\n\r\nAlthough, I don't think I've ever seen localisation used in practice.",
+          "createdAt": "2024-07-05T20:17:38Z",
+          "updatedAt": "2024-07-05T20:18:00Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
