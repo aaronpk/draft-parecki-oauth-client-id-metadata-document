@@ -156,7 +156,7 @@ to retrieve the client registration information.
 The client metadata document URL is a JSON document containing the metadata
 of the client. The client metadata values are the values defined in
 the OAuth Dynamic Client Registration Metadata OAuth Parameters registry
-https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata
+<https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata>.
 
 The client metadata document MUST contain a `client_id` property whose value
 MUST compare and match the URL of the document using simple string comparison as
