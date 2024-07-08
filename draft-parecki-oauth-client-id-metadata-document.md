@@ -1,7 +1,7 @@
 ---
 title: "OAuth Client ID Metadata Document"
 abbrev: "Client ID Document"
-category: info
+category: std
 
 docname: draft-parecki-oauth-client-id-metadata-document-latest
 submissiontype: IETF
@@ -34,6 +34,7 @@ normative:
   RFC6749:
   RFC6819:
   RFC7591:
+  RFC8414:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
@@ -54,6 +55,21 @@ informative:
       - name: elf Pavlik
         ins: elf Pavlik
       - name: Dmitri Zagidulin
+  OpenID:
+    title: "OpenID Connect Core 1.0"
+    date: 2023-12-15
+    target: https://openid.net/specs/openid-connect-core-1_0.html
+    author:
+      - name: N. Sakimura
+        org: NAT.Consulting
+      - name: J. Bradley
+        org: Yubico
+      - name: M. Jones
+        org: Self-Issued Consulting
+      - name: B. de Medeiros
+        org: Google
+      - name: C. Mortimore
+        org: Disney
   OpenID.Federation:
     title: "OpenID Federation 1.0"
     date: 2024-05-17
@@ -71,6 +87,9 @@ informative:
         org: independent
       - name: V. Dzhuvinov
         org: Connect2id
+
+entity:
+  SELF: "[draft-parecki-oauth-client-id-metadata-document-latest]"
 
 --- abstract
 
@@ -147,6 +166,10 @@ The client metadata document MAY define additional properties in the response.
 The client metadata document MAY also be served with more specific content types
 as long as the response is JSON and conforms to `application/<AS-defined>+json`.
 
+The `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
+or `client_secret_basic`, as there is no way to establish a shared secret to be
+used with these authentication methods. See {{client_authentication}} for more details.
+
 Other specifications MAY place additional restrictions on the contents of the
 client metadata document accepted by authorization servers implementing their
 specification, for instance, preventing the registration of confidential clients
@@ -174,20 +197,29 @@ is valid?
 ## Redirect URL Registration
 
 According to {{I-D.draft-ietf-oauth-security-topics}}, the authorization server
-MUST require registration of redirect URLs, and compare redirect URLs with
-exact string matching. This client information discovery establishes a
-registered redirect URL with the authorization server which is used when
-comparing the redirect URL in an authorization request against the registered
-redirect URLs.
+MUST require registration of redirect URIs, and MUST ensure that the redirect URI
+in a request is an exact match of a registered redirect URI.
 
-TBD: Is it exact string matching, or is it still using simple string comparison per [RFC3986]
+This method of client information discovery establishes a
+registered redirect URI with the authorization server which is used when
+comparing the redirect URI in an authorization request against the registered
+redirect URIs.
+
+# Authorization Server Metadata {#as-metadata}
+
+Authorization servers that publish Authorization Server Metadata {{RFC8414}} MUST include the following property to signal support for client metadata documents as described in this specification.
+
+`client_id_metadata_document_supported`:
+: OPTIONAL. Boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL as described in this specification.
+
+This enables clients to avoid sending the user to a dead end, by only redirecting the user to an authorization server that supports this specification. Otherwise, the client would redirect the user and the user would be met with an error about an invalid client as described by Section 4.1.2.1 of {{RFC6749}}.
 
 
 # Security Considerations
 
 In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{I-D.draft-ietf-oauth-security-topics}} the additional considerations apply.
 
-## Public vs Confidential Clients
+## Client Authentication {#client_authentication}
 
 Since the client establishes its own registration data at the authorization server,
 prior coordination of client credentials is not possible. However, clients MAY establish
@@ -195,7 +227,7 @@ credentials at the authorization server by using authentication methods that use
 public/private key pairs, by publishing the public key in their metadata document.
 
 For example, the client MAY include the following properties in its metadata document
-to establish a public key and the `private_key_jwt` authentication method:
+to establish a public key and the `private_key_jwt` authentication method defined in {{OpenID}}:
 
     {
       ...
@@ -221,9 +253,22 @@ If fetching the client metadata document fails for any reason, the `client_id` U
 Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers SHOULD avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers SHOULD also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.
 
 
+## Maximum Response Size for Client Metadata Documents
+
+Authorization servers SHOULD limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.
+
+
 # IANA Considerations
 
-This document has no IANA actions.
+## OAuth Authorization Server Metadata Registry
+
+The following authorization server metadata value is defined by this specification and registered in the IANA "OAuth Authorization Server Metadata" registry established in OAuth 2.0 Authorization Server Metadata [RFC8414].
+
+* Metadata Name: `client_id_metadata_document_supported`:
+* Metadata Description: JSON boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL.
+* Change Controller: IETF
+* Specification Document: {{as-metadata}} of {{&SELF}}
+
 
 
 --- back
@@ -233,4 +278,15 @@ This document has no IANA actions.
 
 The idea of using URIs as the `client_id` in OAuth based authorization requests is not new, and has previously been specified in varying ways by [IndieAuth], [Solid-OIDC], and [OpenID.Federation]. This specification is largely inspired by the work of Aaron Coburn, elf Pavlik, and Dmitri Zagidulin in their [Solid-OIDC] specification which defined dereferenceable Client Identifier Documents.
 
-TODO further acknowledgements?
+The authors would like to thank the following people for their contributions and reviews of this specification: Matthieu Sieben.
+
+
+# Document History
+{:numbered="false"}
+
+(This appendix to be deleted by the RFC editor in the final specification.)
+
+-00
+
+* Initial draft
+
