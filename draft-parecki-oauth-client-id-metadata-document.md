@@ -88,6 +88,9 @@ informative:
       - name: V. Dzhuvinov
         org: Connect2id
 
+entity:
+  SELF: "[draft-parecki-oauth-client-id-metadata-document-latest]"
+
 --- abstract
 
 This specification defines a mechanism through which an OAuth client can
@@ -249,6 +252,11 @@ If fetching the client metadata document fails for any reason, the `client_id` U
 Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers SHOULD avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers SHOULD also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.
 
 
+## Maximum Response Size for Client Metadata Documents
+
+Authorization servers SHOULD limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.
+
+
 # IANA Considerations
 
 ## OAuth Authorization Server Metadata Registry
@@ -258,7 +266,7 @@ The following authorization server metadata value is defined by this specificati
 * Metadata Name: `client_id_metadata_document_supported`:
 * Metadata Description: JSON boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL.
 * Change Controller: IETF
-* Specification Document: {{as-metadata}} of [[ this document ]]
+* Specification Document: {{as-metadata}} of {{&SELF}}
 
 
 
@@ -275,7 +283,7 @@ The authors would like to thank the following people for their contributions and
 # Document History
 {:numbered="false"}
 
-[[ To be removed from the final specification ]]
+(This appendix to be deleted by the RFC editor in the final specification.)
 
 -00
 
