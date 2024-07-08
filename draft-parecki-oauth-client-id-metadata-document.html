@@ -15,11 +15,11 @@ as a  client_id  in an OAuth flow, where the URL refers to a document containing
 the necessary client metadata, enabling the authorization server to fetch the
 metadata about the client as needed. 
     " name="description">
-<meta content="xml2rfc 3.21.0" name="generator">
+<meta content="xml2rfc 3.22.0" name="generator">
 <meta content="oauth" name="keyword">
 <meta content="draft-parecki-oauth-client-id-metadata-document-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.21.0
+  xml2rfc 3.22.0
     Python 3.12.3
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
@@ -29,9 +29,8 @@ metadata about the client as needed.
     platformdirs 4.2.2
     pycountry 22.3.5
     PyYAML 6.0.1
-    requests 2.31.0
+    requests 2.32.3
     setuptools 69.5.1
-    six 1.16.0
     wcwidth 0.2.13
 -->
 <link href="draft-parecki-oauth-client-id-metadata-document.xml" rel="alternate" type="application/rfc+xml">
@@ -1035,7 +1034,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Parecki &amp; Smith</td>
-<td class="center">Expires 3 January 2025</td>
+<td class="center">Expires 9 January 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1048,12 +1047,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-parecki-oauth-client-id-metadata-document-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-07-02" class="published">2 July 2024</time>
+<time datetime="2024-07-08" class="published">8 July 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-01-03">3 January 2025</time></dd>
+<dd class="expires"><time datetime="2025-01-09">9 January 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1111,7 +1110,7 @@ metadata about the client as needed.<a href="#section-abstract-1" class="pilcrow
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1180,6 +1179,9 @@ metadata about the client as needed.<a href="#section-abstract-1" class="pilcrow
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-server-side-request-forgery" class="internal xref">Server Side Request Forgery (SSRF) Attacks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-maximum-response-size-for-c" class="internal xref">Maximum Response Size for Client Metadata Documents</a></p>
 </li>
             </ul>
 </li>
@@ -1405,6 +1407,14 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
 <p id="section-6.3-1">Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers <span class="bcp14">SHOULD</span> avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers <span class="bcp14">SHOULD</span> also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
+<div id="maximum-response-size-for-client-metadata-documents">
+<section id="section-6.4">
+        <h3 id="name-maximum-response-size-for-c">
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-maximum-response-size-for-c" class="section-name selfRef">Maximum Response Size for Client Metadata Documents</a>
+        </h3>
+<p id="section-6.4-1">Authorization servers <span class="bcp14">SHOULD</span> limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana-considerations">
@@ -1429,7 +1439,7 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
             <p id="section-7.1-2.3.1">Change Controller: IETF<a href="#section-7.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-2.4">
-            <p id="section-7.1-2.4.1">Specification Document: <a href="#as-metadata" class="auto internal xref">Section 5</a> of [[ this document ]]<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-2.4.1">Specification Document: <a href="#as-metadata" class="auto internal xref">Section 5</a> of [draft-parecki-oauth-client-id-metadata-document-latest]<a href="#section-7.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -1521,7 +1531,7 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
       <h2 id="name-document-history">
 <a href="#name-document-history" class="section-name selfRef">Document History</a>
       </h2>
-<p id="appendix-B-1">[[ To be removed from the final specification ]]<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">(This appendix to be deleted by the RFC editor in the final specification.)<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <p id="appendix-B-2">-00<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">
