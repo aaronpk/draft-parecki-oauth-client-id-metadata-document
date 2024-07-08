@@ -1285,7 +1285,8 @@ to retrieve the client registration information.<a href="#section-4-2" class="pi
         </h3>
 <p id="section-4.1-1">The client metadata document URL is a JSON document containing the metadata
 of the client. The client metadata values are the values defined in
-OAuth Dynamic Client Registration (<span>[<a href="#RFC7591" class="cite xref">RFC7591</a>]</span>) section 2.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+the OAuth Dynamic Client Registration Metadata OAuth Parameters registry
+https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <p id="section-4.1-2">The client metadata document <span class="bcp14">MUST</span> contain a <code>client_id</code> property whose value
 <span class="bcp14">MUST</span> compare and match the URL of the document using simple string comparison as
 defined in <span>[<a href="#RFC3986" class="cite xref">RFC3986</a>]</span> Section 6.2.1.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
@@ -1523,7 +1524,7 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
 <p id="appendix-A-1">The idea of using URIs as the <code>client_id</code> in OAuth based authorization requests is not new, and has previously been specified in varying ways by <span>[<a href="#IndieAuth" class="cite xref">IndieAuth</a>]</span>, <span>[<a href="#Solid-OIDC" class="cite xref">Solid-OIDC</a>]</span>, and <span>[<a href="#OpenID.Federation" class="cite xref">OpenID.Federation</a>]</span>. This specification is largely inspired by the work of Aaron Coburn, elf Pavlik, and Dmitri Zagidulin in their <span>[<a href="#Solid-OIDC" class="cite xref">Solid-OIDC</a>]</span> specification which defined dereferenceable Client Identifier Documents.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">The authors would like to thank the following people for their contributions and reviews of this specification: Matthieu Sieben.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">The authors would like to thank the following people for their contributions and reviews of this specification: Dick Hardt, Matthieu Sieben.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="document-history">
@@ -1532,10 +1533,19 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
 <a href="#name-document-history" class="section-name selfRef">Document History</a>
       </h2>
 <p id="appendix-B-1">(This appendix to be deleted by the RFC editor in the final specification.)<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2">-00<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">-01<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-B-3.1">
-          <p id="appendix-B-3.1.1">Initial draft<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.1.1">Added recommendation of max metadata document size<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.2">
+          <p id="appendix-B-3.2.1">Changed metadata property reference to IANA registry instead of Dynamic Client Registration<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-B-4">-00<a href="#appendix-B-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.1">
+          <p id="appendix-B-5.1.1">Initial draft<a href="#appendix-B-5.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>

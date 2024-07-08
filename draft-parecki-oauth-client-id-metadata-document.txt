@@ -155,7 +155,9 @@ Table of Contents
 
    The client metadata document URL is a JSON document containing the
    metadata of the client.  The client metadata values are the values
-   defined in OAuth Dynamic Client Registration ([RFC7591]) section 2.
+   defined in the OAuth Dynamic Client Registration Metadata OAuth
+   Parameters registry https://www.iana.org/assignments/oauth-
+   parameters/oauth-parameters.xhtml#client-metadata
 
    The client metadata document MUST contain a client_id property whose
    value MUST compare and match the URL of the document using simple
@@ -391,12 +393,20 @@ Acknowledgments
    which defined dereferenceable Client Identifier Documents.
 
    The authors would like to thank the following people for their
-   contributions and reviews of this specification: Matthieu Sieben.
+   contributions and reviews of this specification: Dick Hardt, Matthieu
+   Sieben.
 
 Document History
 
    (This appendix to be deleted by the RFC editor in the final
    specification.)
+
+   -01
+
+   *  Added recommendation of max metadata document size
+
+   *  Changed metadata property reference to IANA registry instead of
+      Dynamic Client Registration
 
    -00
 
