@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-07T00:31:27.485313+00:00",
+  "timestamp": "2024-07-09T00:28:20.428186+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -223,15 +223,15 @@
       "id": "I_kwDOL_Xevs6MMAsX",
       "title": "Add a recommendation to set a max size for the expected HTTP response when fetching client metadata",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/9",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "aaronpk",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2024-06-13T20:02:59Z",
-      "updatedAt": "2024-06-13T20:03:00Z",
-      "closedAt": null,
+      "updatedAt": "2024-07-08T16:12:20Z",
+      "closedAt": "2024-07-08T16:12:20Z",
       "comments": []
     },
     {
@@ -314,7 +314,7 @@
       "labels": [],
       "body": "We've currently a restriction for `client_id` URIs that they MUST be https scheme. \r\n\r\nIn development environments where all software is running on localhost, we should probably provide an exception to that rule, given the issues that can be faced (self-signed certificates, custom root certificates, etc) with settings up HTTPS in development.",
       "createdAt": "2024-07-03T11:53:42Z",
-      "updatedAt": "2024-07-05T14:34:10Z",
+      "updatedAt": "2024-07-08T19:07:41Z",
       "closedAt": null,
       "comments": [
         {
@@ -344,6 +344,27 @@
           "body": "> I realize now that there is another solution that we did not envision; that is to offer a \"client metadata as a service\" endpoint that would use query params to build the client metadata\r\n\r\nThis was something that the dev tools team I was on floated as an idea, but we went with writing a generator / validator as a project for @laurin-w \u2014 unfortunately product at inrupt killed the project after it was built.\r\n\r\nIf you do support a client_id metadata documents as a service system, I'd recommend limiting it only to localhost & private IP addresses, as to make it a development-only service, such that it can't compromise production systems.",
           "createdAt": "2024-07-05T14:34:09Z",
           "updatedAt": "2024-07-05T14:34:09Z"
+        },
+        {
+          "author": "dickhardt",
+          "authorAssociation": "NONE",
+          "body": "FYI: At Hell\u014d https://console.hello.coop  we separate development redirect URIs from production redirect URIs. We only allow developers and testers that are registered with the team to use development redirect URIs. We then enable localhost and 127.0.0.1 by default on app creation to simplify getting up and running. \r\n\r\nThis simplifies development without the security concerns of a deployment that uses localhost. ",
+          "createdAt": "2024-07-08T17:55:57Z",
+          "updatedAt": "2024-07-08T17:55:57Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@dickhardt so you've two clients? one for development and one for production usage? This seems fine to me. Another approach I've seen pretty commonly is to just run a development AS and a production AS, and have laxer requirements on the former.\r\n\r\nHowever, I don't think the `client_id` URI can be a non-public URI, since the AS SHOULD request the document at this location or fail the authorization request; perhaps it's worth making this a MUST? i.e., MUST request the document, unless it has a cached copy with respect to cache-control HTTP headers.",
+          "createdAt": "2024-07-08T18:40:01Z",
+          "updatedAt": "2024-07-08T18:40:01Z"
+        },
+        {
+          "author": "dickhardt",
+          "authorAssociation": "NONE",
+          "body": "Just one client. If the provided redirect_uri is not in the list of production redirect_uris, then I check if it is a develop redirect_uri and if the user is part of the team. This is when I would allow localhost development flows. Here is a screenshot of our console page.\r\n\r\n![image](https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/assets/688982/3dfb394c-d3ec-4bf0-9c93-b7b87ae4bc4b)\r\n\r\nTo support localhost, perhaps you have to be a registered developer at the AS?  \r\n\r\nI don't think I have all the context of the use cases everyone else involved is wanting to solve. It does seem like there could be different requirements for developers vs users. \r\n\r\nIt seems one of the requirements is to someone can deploy software or use a service that has their own metadata and their own client_id without having to register their app ahead of time. The question is can they do that on localhost.\r\n",
+          "createdAt": "2024-07-08T19:07:40Z",
+          "updatedAt": "2024-07-08T19:07:40Z"
         }
       ]
     },
@@ -362,6 +383,94 @@
       "updatedAt": "2024-07-05T17:40:55Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 15,
+      "id": "I_kwDOL_Xevs6O0BP0",
+      "title": "Consider minimum set of properties to require for interoperability",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/15",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From Dick's review on the email list: https://mailarchive.ietf.org/arch/msg/oauth/tgHv0MMU8PqyNjwsXIze3BUSn9s/\r\n\r\n> Along those lines, it may be useful to recommend which of those\r\n> properties are useful and why. For example, should I have a contact\r\n> property? I think there should be a minimum to implement so there is\r\n> interoperability -- otherwise it is hit or miss if it will work. The one\r\n> bit of client_id_metadata_document_supported will unlikely not be enough to\r\n> have a successful flow unless there is a MTI.",
+      "createdAt": "2024-07-08T15:54:27Z",
+      "updatedAt": "2024-07-08T15:54:28Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOL_Xevs6O0Bg6",
+      "title": "Update property reference to IANA registry instead of DCR",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/16",
+      "state": "CLOSED",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From Dick's review: https://mailarchive.ietf.org/arch/msg/oauth/tgHv0MMU8PqyNjwsXIze3BUSn9s/\r\n\r\nhttps://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata",
+      "createdAt": "2024-07-08T15:54:55Z",
+      "updatedAt": "2024-07-08T16:18:24Z",
+      "closedAt": "2024-07-08T16:18:24Z",
+      "comments": []
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOL_Xevs6O0Ftx",
+      "title": "Add guidance for an AS that supports both registered and unregistered clients",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/17",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "From Dick's review: https://mailarchive.ietf.org/arch/msg/oauth/tgHv0MMU8PqyNjwsXIze3BUSn9s/\r\n\r\n> If an AS supports both registered, and unregistered clients, is there\r\n> any guidance or requirements on differentiating between them such as NOT\r\n> issuing other identifiers that start with 'https\"?",
+      "createdAt": "2024-07-08T16:02:44Z",
+      "updatedAt": "2024-07-08T16:02:44Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 18,
+      "id": "I_kwDOL_Xevs6O0tHv",
+      "title": "Add guidance that all URIs should be absolute, and not relative",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/18",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I picked this up from @nseydoux on the Inrupt team, where the OAuth spec doesn't actually require absolute URIs for various properties like logo_uri, tos_uri, etc.\r\n\r\nRef: https://github.com/solid/solid-oidc/issues/231",
+      "createdAt": "2024-07-08T17:29:45Z",
+      "updatedAt": "2024-07-08T17:29:45Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOL_Xevs6O0tkz",
+      "title": "Should data uri be allowed as logo_uri ?",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/19",
+      "state": "OPEN",
+      "author": "matthieusieben",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "If so, how would it impact the size limit of the whole metadata document ?",
+      "createdAt": "2024-07-08T17:30:56Z",
+      "updatedAt": "2024-07-08T17:38:25Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I would argue that data URIs should _**not**_ be used in the metadata documents, and only `https` URIs should be used. If you did wish to support data URIs, then it would obviously increase the size limit you'd need for the whole metadata document .\r\n\r\nThat's why I went with a non-binding size limit recommendation of 5kb, because I'm aware that there can be certain scenarios where the document may be bigger, particularly with localisation of fields and such.",
+          "createdAt": "2024-07-08T17:38:12Z",
+          "updatedAt": "2024-07-08T17:38:25Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -563,24 +672,26 @@
       "id": "PR_kwDOL_Xevs50jyAY",
       "title": "Feat: Maximum response size for Client Metadata Documents",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/14",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I did some research through other OAuth related specifications and couldn't find any similar language. I'm unsure if we should set an absolute maximum, but I think a recommendation of 5 kilobytes is probably sufficient for almost all use cases.\r\n\r\nI think typically these documents are under 1kb in size.\r\n\r\nResolves #9 ",
       "createdAt": "2024-07-05T18:29:10Z",
-      "updatedAt": "2024-07-05T20:18:00Z",
+      "updatedAt": "2024-07-08T16:12:19Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "4acdf4744b8ab91ab77a186e2bf1c1901e365219",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "feat/document-response-max-size",
       "headRefOid": "8d46176b64b72b7a2db09c487019bbef1b50ae30",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2024-07-08T16:12:19Z",
+      "mergedAt": "2024-07-08T16:12:19Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "55b78eaa15323c61354812362c2b721e7a122380"
+      },
       "comments": [
         {
           "author": "ThisIsMissEm",
@@ -588,6 +699,13 @@
           "body": "One thing that may drive up the size of a client metadata document is full localisation of localisable properties in the document, given that the IANA language subtag registry includes several thousand languages: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry\r\n\r\nSo maybe this limitation would actually be problematic, and we should just suggest something less than X megabytes, instead of kilobytes?\r\n\r\nAlthough, I don't think I've ever seen localisation used in practice.",
           "createdAt": "2024-07-05T20:17:38Z",
           "updatedAt": "2024-07-05T20:18:00Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "The other option for localization is to use a different client ID per language, `https://example.com/id/en` `https://example.com/id/de` etc.\r\n\r\nThis is good enough for now , we can always change it later if we get more feedback.",
+          "createdAt": "2024-07-08T16:12:16Z",
+          "updatedAt": "2024-07-08T16:12:16Z"
         }
       ],
       "reviews": []
