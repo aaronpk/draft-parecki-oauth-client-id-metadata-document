@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-11T00:29:24.075847+00:00",
+  "timestamp": "2024-07-14T00:32:22.329003+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -460,7 +460,7 @@
       "labels": [],
       "body": "If so, how would it impact the size limit of the whole metadata document ?",
       "createdAt": "2024-07-08T17:30:56Z",
-      "updatedAt": "2024-07-08T17:38:25Z",
+      "updatedAt": "2024-07-12T20:07:29Z",
       "closedAt": null,
       "comments": [
         {
@@ -469,6 +469,27 @@
           "body": "I would argue that data URIs should _**not**_ be used in the metadata documents, and only `https` URIs should be used. If you did wish to support data URIs, then it would obviously increase the size limit you'd need for the whole metadata document .\r\n\r\nThat's why I went with a non-binding size limit recommendation of 5kb, because I'm aware that there can be certain scenarios where the document may be bigger, particularly with localisation of fields and such.",
           "createdAt": "2024-07-08T17:38:12Z",
           "updatedAt": "2024-07-08T17:38:25Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Well, one advantage of data-uri is that it is easier to let the AS \"allow list\" a particular image for a particular client, and show that image to the user while authorizing.\r\n\r\nWhen an HTTPS uri is used, the actual file served could be different for the AS and USER, which could help performing phishing attacks.",
+          "createdAt": "2024-07-12T18:24:37Z",
+          "updatedAt": "2024-07-12T18:24:56Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "But I agree that the effect on the document size is not ideal...",
+          "createdAt": "2024-07-12T18:25:31Z",
+          "updatedAt": "2024-07-12T18:25:31Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> When an HTTPS uri is used, the actual file served could be different for the AS and USER, which could help performing phishing attacks.\r\n\r\nThis is true, but linking directly to a remote file on a security sensitive page would not be advisable; Instead I'd recommend AS's cache media assets such as the application logo",
+          "createdAt": "2024-07-12T20:07:06Z",
+          "updatedAt": "2024-07-12T20:07:29Z"
         }
       ]
     }
