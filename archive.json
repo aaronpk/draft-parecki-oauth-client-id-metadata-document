@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-21T00:32:03.366020+00:00",
+  "timestamp": "2024-07-23T00:29:09.890933+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -492,6 +492,22 @@
           "updatedAt": "2024-07-12T20:07:29Z"
         }
       ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDOL_Xevs6QeUFQ",
+      "title": "Review relationship of SPICE Metadata Discovery",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/20",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://www.ietf.org/archive/id/draft-steele-spice-metadata-discovery-01.html",
+      "createdAt": "2024-07-22T22:23:00Z",
+      "updatedAt": "2024-07-22T22:23:00Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
