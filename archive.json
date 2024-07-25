@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-23T00:29:09.890933+00:00",
+  "timestamp": "2024-07-25T00:29:00.326831+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -506,6 +506,60 @@
       "body": "https://www.ietf.org/archive/id/draft-steele-spice-metadata-discovery-01.html",
       "createdAt": "2024-07-22T22:23:00Z",
       "updatedAt": "2024-07-22T22:23:00Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 21,
+      "id": "I_kwDOL_Xevs6QlwRk",
+      "title": "Specific guidance for Mobile Application usage",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/21",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "With mobile applications, unless you use application claimed https URLs and the system authentication mechanisms (I believe Apple and Google have a \"sign in with\" dialog for this now, instead of using an in-app webview), then there is potential for the `redirect_uris` to be hijacked by another application (e.g., if using a `myapp://` redirect URI scheme.\r\n\r\nI'm not sure what can be done to further mitigate this, besides DPoP and PKCE which mitigate redirect hijacking attempts.",
+      "createdAt": "2024-07-23T18:10:13Z",
+      "updatedAt": "2024-07-23T18:56:02Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Is there anything unique about this draft in regards to mobile apps? The custom scheme redirect URI issue applies to all OAuth clients, whether or not they provide their own metadata.",
+          "createdAt": "2024-07-23T18:16:14Z",
+          "updatedAt": "2024-07-23T18:16:14Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Yeah, I suspect there is just the same security considerations as with any custom scheme redirect URI + mobile apps, but it may not be a bad idea to reinforce that for mobile applications, you definitely want to use PKCE if using this I-D?\r\n\r\nOr maybe we just cross link to the OAuth 2.0 Security Best Current Practice document as the first section in Security Considerations, highlighting a few of the possible attack vectors to be aware of?",
+          "createdAt": "2024-07-23T18:54:58Z",
+          "updatedAt": "2024-07-23T18:54:58Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "So like in the opening to `6. Security Considerations` explicitly listing some of the considerations to pay attention to.",
+          "createdAt": "2024-07-23T18:56:01Z",
+          "updatedAt": "2024-07-23T18:56:01Z"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "id": "I_kwDOL_Xevs6QupaB",
+      "title": "Address security contradiction of user-supplied client_id values",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/22",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In OAuth 2.0 Security Best Current Practices, there's [the paragraph](https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-27.html#section-2.6-4):\r\n\r\n> Under the conditions described in [Section 4.15.1](https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-27.html#client_impersonating_countermeasures), authorization servers SHOULD NOT allow clients to influence their client_id or any claim that could cause confusion with a genuine resource owner.\r\n\r\nSince this proposal explicitly allows for user-supplied client_id values, we should probably include security guidance for such:\r\n\r\nThis is likely related to #17 \r\n",
+      "createdAt": "2024-07-24T17:45:05Z",
+      "updatedAt": "2024-07-24T17:45:05Z",
       "closedAt": null,
       "comments": []
     }
