@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-04T00:32:11.201474+00:00",
+  "timestamp": "2024-08-06T00:29:12.966061+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -444,9 +444,17 @@
       "labels": [],
       "body": "I picked this up from @nseydoux on the Inrupt team, where the OAuth spec doesn't actually require absolute URIs for various properties like logo_uri, tos_uri, etc.\r\n\r\nRef: https://github.com/solid/solid-oidc/issues/231",
       "createdAt": "2024-07-08T17:29:45Z",
-      "updatedAt": "2024-07-08T17:29:45Z",
+      "updatedAt": "2024-08-04T13:58:17Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "Zegnat",
+          "authorAssociation": "NONE",
+          "body": "I was trying to figure out if there was any earlier discussion about this for [RFC 8414, Authorization server Metadata](https://www.rfc-editor.org/rfc/rfc8414). But I was not able to find anything. Feels like that would have had the same issue, but it has never come up?",
+          "createdAt": "2024-08-04T13:58:16Z",
+          "updatedAt": "2024-08-04T13:58:16Z"
+        }
+      ]
     },
     {
       "number": 19,
