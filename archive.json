@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-22T00:29:54.676097+00:00",
+  "timestamp": "2024-08-25T00:33:00.072242+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -314,7 +314,7 @@
       "labels": [],
       "body": "We've currently a restriction for `client_id` URIs that they MUST be https scheme. \r\n\r\nIn development environments where all software is running on localhost, we should probably provide an exception to that rule, given the issues that can be faced (self-signed certificates, custom root certificates, etc) with settings up HTTPS in development.",
       "createdAt": "2024-07-03T11:53:42Z",
-      "updatedAt": "2024-07-08T19:07:41Z",
+      "updatedAt": "2024-08-24T21:41:09Z",
       "closedAt": null,
       "comments": [
         {
@@ -365,6 +365,55 @@
           "body": "Just one client. If the provided redirect_uri is not in the list of production redirect_uris, then I check if it is a develop redirect_uri and if the user is part of the team. This is when I would allow localhost development flows. Here is a screenshot of our console page.\r\n\r\n![image](https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/assets/688982/3dfb394c-d3ec-4bf0-9c93-b7b87ae4bc4b)\r\n\r\nTo support localhost, perhaps you have to be a registered developer at the AS?  \r\n\r\nI don't think I have all the context of the use cases everyone else involved is wanting to solve. It does seem like there could be different requirements for developers vs users. \r\n\r\nIt seems one of the requirements is to someone can deploy software or use a service that has their own metadata and their own client_id without having to register their app ahead of time. The question is can they do that on localhost.\r\n",
           "createdAt": "2024-07-08T19:07:40Z",
           "updatedAt": "2024-07-08T19:07:40Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Another concern in the case of `http://localhost` clients is the ability to declare the scopes that the client will actually request.\r\nThere are basically two approaches here:\r\n- either define no scope in the generated client metadata and let the server decide a auth time what scopes are actually granted\r\n- add a query string to the client id that describes the scope that the client would want to have (similar to the redirect_uris)\r\nWe chose to do the former.",
+          "createdAt": "2024-08-23T17:37:01Z",
+          "updatedAt": "2024-08-23T17:37:01Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "The drawback of the approach we decided to adopt is that is it quite counter intuitive with what you would expect the server to do with \"regular\" accessible client metadata documents. In the case a metadata document is actually available, we do require that document to list all the scopes that may be requested during an auth flow, and will return an error if more scopes are requested at auth time.",
+          "createdAt": "2024-08-23T17:39:38Z",
+          "updatedAt": "2024-08-23T17:39:38Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think the direction I'm most leaning towards here is having a service hosted for localhost & development usage, I'm chatting with Fastly about if they could host such.",
+          "createdAt": "2024-08-23T18:26:29Z",
+          "updatedAt": "2024-08-23T18:26:29Z"
+        },
+        {
+          "author": "dickhardt",
+          "authorAssociation": "NONE",
+          "body": "A feature of localhost dev is that it works when offline ",
+          "createdAt": "2024-08-23T20:43:37Z",
+          "updatedAt": "2024-08-23T20:43:37Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Right, but for this internet draft, it's specifically about authentication against decentralised services.\r\n\r\nSure, you could run the Authorization Server and App both on localhost and support localhost client ID metadata documents, that'd be fine, but it's very common that the Authorization Server is say, `mastodon.social` in which case you need a Client ID Metadata Document that can be fetched by `mastodon.social`\r\n\r\nSo we could add language that `localhost` URIs for Client ID Metadata Documents are supported only if the Authorization Server is also on localhost.",
+          "createdAt": "2024-08-23T22:08:51Z",
+          "updatedAt": "2024-08-23T22:08:51Z"
+        },
+        {
+          "author": "dickhardt",
+          "authorAssociation": "NONE",
+          "body": "Works for me. I was calling out potential confusion using the localhost term when using a service",
+          "createdAt": "2024-08-24T19:19:03Z",
+          "updatedAt": "2024-08-24T19:19:03Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Yeah, I think the current language was written such that it worked first for production environments, which tbh makes sense & in that scenario typically the AS and Client app are not operated by the same entity ",
+          "createdAt": "2024-08-24T21:41:09Z",
+          "updatedAt": "2024-08-24T21:41:09Z"
         }
       ]
     },
