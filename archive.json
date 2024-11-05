@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-11-03T00:37:16.847190+00:00",
+  "timestamp": "2024-11-05T00:33:30.202170+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -617,6 +617,22 @@
       "body": "In OAuth 2.0 Security Best Current Practices, there's [the paragraph](https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-27.html#section-2.6-4):\r\n\r\n> Under the conditions described in [Section 4.15.1](https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-27.html#client_impersonating_countermeasures), authorization servers SHOULD NOT allow clients to influence their client_id or any claim that could cause confusion with a genuine resource owner.\r\n\r\nSince this proposal explicitly allows for user-supplied client_id values, we should probably include security guidance for such:\r\n\r\nThis is likely related to #17 \r\n",
       "createdAt": "2024-07-24T17:45:05Z",
       "updatedAt": "2024-07-24T17:45:05Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 23,
+      "id": "I_kwDOL_Xevs6c-6ck",
+      "title": "Clarify the security implications of using query parameters in client_id to dynamically generate metadata documents",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/23",
+      "state": "OPEN",
+      "author": "birdhalfbaked",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "While reading the draft, it currently seems to allow broad use of query parameters in the client_id for sending information that a guides the use of metadata that should be retrieved in the flows. \r\n\r\n> **Client identifier URLs MAY contain a query string component** and MAY contain a port.\r\n> This specification places no restrictions on what URL is used as a client identifier. A short URL is RECOMMENDED, since the URL may be displayed to the end user in the authorization interface or in management interfaces. Usage of a stable URL that does not frequently change for the client is also RECOMMENDED.\r\n\r\n(emphasis mine)\r\n\r\nWe already see some implementations using this to facilitate development by passing OAuth metadata (e.g. `scope `and `redirect_uris`) such as with ATProto's use of OAuth in the [localhost exception case](https://atproto.com/specs/oauth), and as written this may mistakenly encourage the use of dynamically-generated metadata documents from user-given inputs even in non-development use cases which can undermine the mechanisms herein.\r\n\r\ne.g. `client_id: https://someurl.com?scope=scope1%20scope2` is allowed, but should be strongly discouraged outside of local development contexts.\r\n\r\nThis discouragement could fit well in the additional **Security Considerations** I am thinking. Something along the lines \"Authorization servers SHOULD reject the use of query params to dynamically generate metadata outside of development contexts where other methods of generating metadata documents are not practical.\" \r\n\r\nWording probably needs work :P Also reinforces some good ideas I've seen around setting up a service for development metadata documents like in #12 ",
+      "createdAt": "2024-11-04T20:07:13Z",
+      "updatedAt": "2024-11-04T20:07:13Z",
       "closedAt": null,
       "comments": []
     }
