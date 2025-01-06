@@ -131,8 +131,7 @@ This specification defines the client identifier as a URL with the following
 restrictions. Client identifier URLs MUST have an "https" scheme, MUST contain a
 path component, MUST NOT contain single-dot or double-dot path segments, MUST
 NOT contain a fragment component and MUST NOT contain a username or password
-component. Client identifier URLs MAY contain a query string component and MAY
-contain a port.
+component. Client identifier URLs MAY contain a port.
 
 This specification places no restrictions on what URL is used as
 a client identifier. A short URL is RECOMMENDED, since the URL may
@@ -166,14 +165,22 @@ The client metadata document MAY define additional properties in the response.
 The client metadata document MAY also be served with more specific content types
 as long as the response is JSON and conforms to `application/<AS-defined>+json`.
 
-The `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
-or `client_secret_basic`, as there is no way to establish a shared secret to be
-used with these authentication methods. See {{client_authentication}} for more details.
+As there is no way to establish a shared secret to be used with client metadata
+documents, the following restrictions apply on the contents of the
+client metadata document:
+
+* the `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
+or `client_secret_basic`
+* the `client_secret_expires_at` property MUST NOT be used
+
+See {{client_authentication}} for more details.
 
 Other specifications MAY place additional restrictions on the contents of the
 client metadata document accepted by authorization servers implementing their
 specification, for instance, preventing the registration of confidential clients
 by requiring the `token_endpoint_auth_method` property be set to `"none"`.
+
+TBD: We may want a property such as `client_id_expires_at` for indicating that the client is ephemeral and not valid after a given timestamp, especially for documents issued by a service for development purposes.
 
 ## Metadata Discovery Errors
 
@@ -218,6 +225,12 @@ This enables clients to avoid sending the user to a dead end, by only redirectin
 # Security Considerations
 
 In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{I-D.draft-ietf-oauth-security-topics}} the additional considerations apply.
+
+## Client ID Metadata Documents for Development Purposes
+
+When developing applications against a service that uses Client ID Metadata Documents, developers often encounter the issue of "how do I serve a Client ID Metadata Document at a https URL whilst developing my application?".
+
+For this purpose, it is recommended to either host a document on a webserver somewhere that describes the application under development (e.g., using localhost redirect URIs), or to use a service which can generate and host a Client ID Metadata Document for you. Such a service should issue URLs that are stable.
 
 ## Client Authentication {#client_authentication}
 
@@ -285,6 +298,12 @@ The authors would like to thank the following people for their contributions and
 {:numbered="false"}
 
 (This appendix to be deleted by the RFC editor in the final specification.)
+
+-02
+
+* Removed acceptance of query string parameters in Client ID Metadata Document URLs, since this encourages bad security practices (e.g., minting documents based on query string parameters)
+* Added prohibition on the `client_secret_expires_at` property, as it is not relevant for Client ID Metadata Documents.
+* Added security consideration for development use-cases.
 
 -01
 
