@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-05T00:37:46.898499+00:00",
+  "timestamp": "2025-01-07T00:34:50.225170+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -477,9 +477,17 @@
       "labels": [],
       "body": "From Dick's review: https://mailarchive.ietf.org/arch/msg/oauth/tgHv0MMU8PqyNjwsXIze3BUSn9s/\r\n\r\n> If an AS supports both registered, and unregistered clients, is there\r\n> any guidance or requirements on differentiating between them such as NOT\r\n> issuing other identifiers that start with 'https\"?",
       "createdAt": "2024-07-08T16:02:44Z",
-      "updatedAt": "2024-07-08T16:02:44Z",
+      "updatedAt": "2025-01-06T23:42:41Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think this would be dealt with through Client ID Schemes as discussed today, though perhaps we just need a security consideration of \"If an Authorization Server wishes to support both generated client_id values for registered clients and client metadata documents, it should take care to ensure that the generated client_id's do not start with `https://`\"",
+          "createdAt": "2025-01-06T23:42:40Z",
+          "updatedAt": "2025-01-06T23:42:40Z"
+        }
+      ]
     },
     {
       "number": 18,
@@ -517,7 +525,7 @@
       "labels": [],
       "body": "If so, how would it impact the size limit of the whole metadata document ?",
       "createdAt": "2024-07-08T17:30:56Z",
-      "updatedAt": "2024-07-12T20:07:29Z",
+      "updatedAt": "2025-01-06T23:40:19Z",
       "closedAt": null,
       "comments": [
         {
@@ -547,6 +555,20 @@
           "body": "> When an HTTPS uri is used, the actual file served could be different for the AS and USER, which could help performing phishing attacks.\r\n\r\nThis is true, but linking directly to a remote file on a security sensitive page would not be advisable; Instead I'd recommend AS's cache media assets such as the application logo",
           "createdAt": "2024-07-12T20:07:06Z",
           "updatedAt": "2024-07-12T20:07:29Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Have opened #25 ",
+          "createdAt": "2025-01-06T23:38:51Z",
+          "updatedAt": "2025-01-06T23:38:51Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I don't specifically call out data uri's in that security consideration, but more that the authorization server shouldn't just be using the `logo_uri` verbatim in their authorization pages, and instead should fetch the resource and cache it, as to serve it from a trusted domain (this would also be inline with having a narrow CSP for `image-src`)",
+          "createdAt": "2025-01-06T23:40:18Z",
+          "updatedAt": "2025-01-06T23:40:18Z"
         }
       ]
     },
@@ -632,9 +654,31 @@
       "labels": [],
       "body": "While reading the draft, it currently seems to allow broad use of query parameters in the client_id for sending information that a guides the use of metadata that should be retrieved in the flows. \r\n\r\n> **Client identifier URLs MAY contain a query string component** and MAY contain a port.\r\n> This specification places no restrictions on what URL is used as a client identifier. A short URL is RECOMMENDED, since the URL may be displayed to the end user in the authorization interface or in management interfaces. Usage of a stable URL that does not frequently change for the client is also RECOMMENDED.\r\n\r\n(emphasis mine)\r\n\r\nWe already see some implementations using this to facilitate development by passing OAuth metadata (e.g. `scope `and `redirect_uris`) such as with ATProto's use of OAuth in the [localhost exception case](https://atproto.com/specs/oauth), and as written this may mistakenly encourage the use of dynamically-generated metadata documents from user-given inputs even in non-development use cases which can undermine the mechanisms herein.\r\n\r\ne.g. `client_id: https://someurl.com?scope=scope1%20scope2` is allowed, but should be strongly discouraged outside of local development contexts.\r\n\r\nThis discouragement could fit well in the additional **Security Considerations** I am thinking. Something along the lines \"Authorization servers SHOULD reject the use of query params to dynamically generate metadata outside of development contexts where other methods of generating metadata documents are not practical.\" \r\n\r\nWording probably needs work :P Also reinforces some good ideas I've seen around setting up a service for development metadata documents like in #12 ",
       "createdAt": "2024-11-04T20:07:13Z",
-      "updatedAt": "2024-11-04T20:07:13Z",
+      "updatedAt": "2025-01-06T23:45:32Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I would probably say that we should discourage the use of query string arguments in the `client_id` document URL. Instead, services that allow creating a Client ID Metadata Document should instead generate a stable identifier for that document. e.g., instead of `https://client_id.example.com/client.json?scopes=read&client_name=example`, it would be better to have these registered with that service as: `https://client_id.example.com/WtzJCPeDSGs4FsKPlNy3.json` where `WtzJCPeDSGs4FsKPlNy3` identifies the record that stores the metadata.\r\n\r\nThis does make such a service stateful, rather than stateless, but has better security properties, in my opinion.\r\n\r\nI would also think it'd be an idea to introduce a new property in the **OAuth Dynamic Client Registration Metadata** IANA registry of `client_expires_at` which is the timestamp at which the entire client should be deemed no longer valid (such to allow cache purging of development clients), this is necessary as Client ID Metadata Documents don't have a client secret, therefore cannot use `client_secret_expires_at`.",
+          "createdAt": "2025-01-06T22:45:42Z",
+          "updatedAt": "2025-01-06T22:45:42Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Couldn't we use http cache headers to let the client indicate its intended lifetime of the document? Obvs the AS can cache or not cache as long as it wants, but this is an existing mechanism that could be used to indicate the doc lifetime. Also would be worth checking if AS metadata or RS metadata have any mention of http cache headers.",
+          "createdAt": "2025-01-06T22:49:52Z",
+          "updatedAt": "2025-01-06T22:49:52Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think this could be reasonable, but my concern is that the client metadata document could be considered \"expired\" before the AS decides to revalidate its cache. That is, if the client metadata document cache header says \"cache me for a month\" and the AS goes \"nah, I cache things for a 6 months\", then we'll hit into issues where the AS will keep hold of a client metadata document that the provider of the document thinks is expired/no-longer valid.",
+          "createdAt": "2025-01-06T23:45:30Z",
+          "updatedAt": "2025-01-06T23:45:30Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -872,6 +916,127 @@
           "updatedAt": "2024-07-08T16:12:16Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 24,
+      "id": "PR_kwDOL_Xevs6G33QO",
+      "title": "Improve documentation for development usage, prohibiting query parameters in document URLs",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/24",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "A pattern that we've seen sometimes used is to have a service generate Client ID Metadata Documents by taking in data from query parameters and transposing those into the contents of the document, this should probably be considered an anti-pattern, since it circumvents a fair few of the security properties of stable URLs for client id metadata documents.\r\n\r\nThis is noted in #23 and #12, where workarounds have tried to be developed.\r\n\r\nFor instance, for AtProto / Bluesky, they could host a `client_id.atproto.dev` service which allows you to preregistered a client for development purposes (specifying redirect_uris, scopes, etc), giving back a https URL to a document that you can use for that client.\r\n\r\nWe could expand this to allow a Authorization Server to apply additional constrains on the contents of the client metadata document, based on the hostname of the document itself, e.g., only documents on `client_id.atproto.dev` hostname can include redirect URIs that are localhost URIs.",
+      "createdAt": "2025-01-06T23:13:20Z",
+      "updatedAt": "2025-01-06T23:20:06Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "bab0ab4639cf551b97cfec860b0512a55927d790",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "feat/improve-development-usage",
+      "headRefOid": "1dd3a573a598c58997ed96b7d35a875d25f3fe7b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@matthieusieben I think you may want to review this.",
+          "createdAt": "2025-01-06T23:16:52Z",
+          "updatedAt": "2025-01-06T23:16:52Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOL_Xevs6W_G_n",
+          "commit": {
+            "abbreviatedOid": "1dd3a57"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-06T23:14:50Z",
+          "updatedAt": "2025-01-06T23:14:50Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "As far as I know, this isn't a relevant property, and `private_key_jwt` as mentioned in the Client Authentication Security Consideration does not have a \"expires at\", and `client_secret_expires_at` only is relevant for the `client_secret` property.",
+              "createdAt": "2025-01-06T23:14:50Z",
+              "updatedAt": "2025-01-06T23:14:50Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6W_HDk",
+          "commit": {
+            "abbreviatedOid": "1dd3a57"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-06T23:15:11Z",
+          "updatedAt": "2025-01-06T23:15:11Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "We could also include:\r\n```suggestion\r\n* the `client_secret` and `client_secret_expires_at` properties MUST NOT be used\r\n```",
+              "createdAt": "2025-01-06T23:15:11Z",
+              "updatedAt": "2025-01-06T23:15:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6W_ICr",
+          "commit": {
+            "abbreviatedOid": "1dd3a57"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-06T23:20:06Z",
+          "updatedAt": "2025-01-06T23:20:06Z",
+          "comments": [
+            {
+              "originalPosition": 41,
+              "body": "```suggestion\r\n## Client ID Metadata Documents for Development Purposes {#documents_for_development}\r\n```",
+              "createdAt": "2025-01-06T23:20:06Z",
+              "updatedAt": "2025-01-06T23:20:12Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "id": "PR_kwDOL_Xevs6G38Le",
+      "title": "Add security consideration for logo_uri usage",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/25",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I'm not 100% happy with the wording here, but this does begin to address the concerns around displaying logos to end-users that are provided from within the client metadata document.\r\n\r\nThe idea is to provide a security consideration similar to the consideration in Dynamic Client Registration: https://www.rfc-editor.org/rfc/rfc7591.html#section-5\r\n\r\n> In a situation where the authorization server is supporting open client registration, it must be extremely careful with any URL provided by the client that will be displayed to the user (e.g., \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\").  For instance, a rogue client could specify a registration request with a reference to a drive-by download in the \"policy_uri\", enticing the user to click on it during the authorization.  The authorization server SHOULD check to see if the \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\" have the same host and scheme as the those defined in the array of \"redirect_uris\" and that all of these URIs resolve to valid web pages.  Since these URI values that are intended to be displayed to the user at the authorization page, the authorization server SHOULD protect the user from malicious content hosted at the URLs where possible.  For instance, before presenting the URLs to the user at the authorization page, the authorization server could download the content hosted at the URLs, check the content against a malware scanner and blacklist filter, determine whether or not there is mixed secure and non-secure content at the URL, and other possible server-side mitigations.  Note that the content in these URLs can change at any time and the authorization server cannot provide complete confidence in the safety of the URLs, but these practices could help.  To further mitigate this kind of threat, the authorization server can also warn the user that the URL links have been provided by a third party, should be treated with caution, and are not hosted by the authorization server itself.  For instance, instead of providing the links directly in an HTML anchor, the authorization server can direct the user to an interstitial warning page before allowing the user to continue to the target URL\r\n\r\nPerhaps the section should be also including `tos_uri`, `policy_uri` and `client_uri` (e.g., asserting that the Authorization Server can choose to validate the documents at these URIs and also choose whether or not to display these URIs to the end-user.",
+      "createdAt": "2025-01-06T23:38:22Z",
+      "updatedAt": "2025-01-06T23:38:23Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "bab0ab4639cf551b97cfec860b0512a55927d790",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "feat/add-consideration-for-logo_uri",
+      "headRefOid": "8fc35a65f0381e6b6ab3675b2cf3b5914e193289",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
