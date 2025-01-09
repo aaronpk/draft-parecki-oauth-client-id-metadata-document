@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-07T00:34:50.225170+00:00",
+  "timestamp": "2025-01-09T00:34:29.891892+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -654,7 +654,7 @@
       "labels": [],
       "body": "While reading the draft, it currently seems to allow broad use of query parameters in the client_id for sending information that a guides the use of metadata that should be retrieved in the flows. \r\n\r\n> **Client identifier URLs MAY contain a query string component** and MAY contain a port.\r\n> This specification places no restrictions on what URL is used as a client identifier. A short URL is RECOMMENDED, since the URL may be displayed to the end user in the authorization interface or in management interfaces. Usage of a stable URL that does not frequently change for the client is also RECOMMENDED.\r\n\r\n(emphasis mine)\r\n\r\nWe already see some implementations using this to facilitate development by passing OAuth metadata (e.g. `scope `and `redirect_uris`) such as with ATProto's use of OAuth in the [localhost exception case](https://atproto.com/specs/oauth), and as written this may mistakenly encourage the use of dynamically-generated metadata documents from user-given inputs even in non-development use cases which can undermine the mechanisms herein.\r\n\r\ne.g. `client_id: https://someurl.com?scope=scope1%20scope2` is allowed, but should be strongly discouraged outside of local development contexts.\r\n\r\nThis discouragement could fit well in the additional **Security Considerations** I am thinking. Something along the lines \"Authorization servers SHOULD reject the use of query params to dynamically generate metadata outside of development contexts where other methods of generating metadata documents are not practical.\" \r\n\r\nWording probably needs work :P Also reinforces some good ideas I've seen around setting up a service for development metadata documents like in #12 ",
       "createdAt": "2024-11-04T20:07:13Z",
-      "updatedAt": "2025-01-06T23:45:32Z",
+      "updatedAt": "2025-01-07T18:03:00Z",
       "closedAt": null,
       "comments": [
         {
@@ -677,6 +677,20 @@
           "body": "I think this could be reasonable, but my concern is that the client metadata document could be considered \"expired\" before the AS decides to revalidate its cache. That is, if the client metadata document cache header says \"cache me for a month\" and the AS goes \"nah, I cache things for a 6 months\", then we'll hit into issues where the AS will keep hold of a client metadata document that the provider of the document thinks is expired/no-longer valid.",
           "createdAt": "2025-01-06T23:45:30Z",
           "updatedAt": "2025-01-06T23:45:30Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "I like @birdhalfbaked 's proposal to add the following into the security considerations:\r\n\r\n> \"Authorization servers SHOULD reject the use of query params to dynamically generate metadata outside of development contexts where other methods of generating metadata documents are not practical.\"\r\n\r\nI don't think Atproto will get rid of the localhost exception just yet but I can see us adding a restriction forbidding use of query strings for non \"loopback clients\".",
+          "createdAt": "2025-01-07T14:55:15Z",
+          "updatedAt": "2025-01-07T14:55:15Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'd recommend going the route of having a service that registers and serves documents, rather than generating them through query parameters. That way it's just a bit harder to create multiple documents to confuse just by changing URL parameters.\r\n\r\nE.g., by storing that information you can perform validation and moderation on it as necessary.\r\n\r\nThat's why I've gone the route of removing query parameters from the client metadata document URIs.",
+          "createdAt": "2025-01-07T18:02:28Z",
+          "updatedAt": "2025-01-07T18:03:00Z"
         }
       ]
     }
@@ -1025,7 +1039,7 @@
       "labels": [],
       "body": "I'm not 100% happy with the wording here, but this does begin to address the concerns around displaying logos to end-users that are provided from within the client metadata document.\r\n\r\nThe idea is to provide a security consideration similar to the consideration in Dynamic Client Registration: https://www.rfc-editor.org/rfc/rfc7591.html#section-5\r\n\r\n> In a situation where the authorization server is supporting open client registration, it must be extremely careful with any URL provided by the client that will be displayed to the user (e.g., \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\").  For instance, a rogue client could specify a registration request with a reference to a drive-by download in the \"policy_uri\", enticing the user to click on it during the authorization.  The authorization server SHOULD check to see if the \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\" have the same host and scheme as the those defined in the array of \"redirect_uris\" and that all of these URIs resolve to valid web pages.  Since these URI values that are intended to be displayed to the user at the authorization page, the authorization server SHOULD protect the user from malicious content hosted at the URLs where possible.  For instance, before presenting the URLs to the user at the authorization page, the authorization server could download the content hosted at the URLs, check the content against a malware scanner and blacklist filter, determine whether or not there is mixed secure and non-secure content at the URL, and other possible server-side mitigations.  Note that the content in these URLs can change at any time and the authorization server cannot provide complete confidence in the safety of the URLs, but these practices could help.  To further mitigate this kind of threat, the authorization server can also warn the user that the URL links have been provided by a third party, should be treated with caution, and are not hosted by the authorization server itself.  For instance, instead of providing the links directly in an HTML anchor, the authorization server can direct the user to an interstitial warning page before allowing the user to continue to the target URL\r\n\r\nPerhaps the section should be also including `tos_uri`, `policy_uri` and `client_uri` (e.g., asserting that the Authorization Server can choose to validate the documents at these URIs and also choose whether or not to display these URIs to the end-user.",
       "createdAt": "2025-01-06T23:38:22Z",
-      "updatedAt": "2025-01-06T23:38:23Z",
+      "updatedAt": "2025-01-07T18:00:33Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "bab0ab4639cf551b97cfec860b0512a55927d790",
@@ -1036,7 +1050,22 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Note that if we mention caching of those extra resources, the \"[Maximum Response Size for Client Metadata Documents](http://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-maximum-response-size-for-c)\" section should also be updated to account for those resources.",
+          "createdAt": "2025-01-07T15:03:55Z",
+          "updatedAt": "2025-01-07T15:03:55Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@matthieusieben the maximum response size is only for the metadata document itself, not any image resources referenced by it. For those, you would likely need to determine your own appropriate limits. (I'd say < 1mb)",
+          "createdAt": "2025-01-07T18:00:31Z",
+          "updatedAt": "2025-01-07T18:00:31Z"
+        }
+      ],
       "reviews": []
     }
   ]
