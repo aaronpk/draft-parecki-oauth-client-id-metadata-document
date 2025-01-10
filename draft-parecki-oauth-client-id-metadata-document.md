@@ -258,6 +258,12 @@ Authorization servers fetching the client metadata document and resolving URLs l
 Authorization servers SHOULD limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.
 
 
+## Displaying Logos to End-Users
+
+Authorization servers that wish to make use of the `logo_uri` property within client metadata document SHOULD prefetch the file at `logo_uri` and cache it for the cache duration of the client metadata document. This allows for moderation tools to verify the file contents (e.g., preventing usage of logos that look like other logos), as well as preventing the logo from being dynamically changed to confuse an end-user.
+
+Caching of the `logo_uri` response can additionally prevent cross-domain tracking through the `logo_uri` being requested by the client, since the cached file would be served not from the remote URI but instead from a URI that the Authorization server trusts.
+
 # IANA Considerations
 
 ## OAuth Authorization Server Metadata Registry
