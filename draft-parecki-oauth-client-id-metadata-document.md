@@ -131,7 +131,7 @@ This specification defines the client identifier as a URL with the following
 restrictions. Client identifier URLs MUST have an "https" scheme, MUST contain a
 path component, MUST NOT contain single-dot or double-dot path segments, MUST
 NOT contain a fragment component and MUST NOT contain a username or password
-component. Client identifier URLs MAY contain a port.
+Client identifier URLs SHOULD NOT include a query string component, and MAY contain a port.
 
 This specification places no restrictions on what URL is used as
 a client identifier. A short URL is RECOMMENDED, since the URL may
