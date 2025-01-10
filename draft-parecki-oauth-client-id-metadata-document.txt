@@ -5,7 +5,7 @@
 Web Authorization Protocol                                    A. Parecki
 Internet-Draft                                                      Okta
 Intended status: Standards Track                                E. Smith
-Expires: 9 January 2025                                      8 July 2024
+Expires: 14 July 2025                                    10 January 2025
 
 
                    OAuth Client ID Metadata Document
@@ -56,11 +56,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 January 2025.
+   This Internet-Draft will expire on 14 July 2025.
 
 Copyright Notice
 
-   Copyright (c) 2024 IETF Trust and the persons identified as the
+   Copyright (c) 2025 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -88,6 +88,7 @@ Table of Contents
      6.2.  OAuth Phishing Attacks
      6.3.  Server Side Request Forgery (SSRF) Attacks
      6.4.  Maximum Response Size for Client Metadata Documents
+     6.5.  Displaying Logos to End-Users
    7.  IANA Considerations
      7.1.  OAuth Authorization Server Metadata Registry
    8.  References
@@ -297,6 +298,21 @@ Table of Contents
    against the authorization server by consuming excessive resources
    (memory, disk, database).  The recommended maximum response size for
    client metadata documents is 5 kilobytes.
+
+6.5.  Displaying Logos to End-Users
+
+   Authorization servers that wish to make use of the logo_uri property
+   within client metadata document SHOULD prefetch the file at logo_uri
+   and cache it for the cache duration of the client metadata document.
+   This allows for moderation tools to verify the file contents (e.g.,
+   preventing usage of logos that look like other logos), as well as
+   preventing the logo from being dynamically changed to confuse an end-
+   user.
+
+   Caching of the logo_uri response can additionally prevent cross-
+   domain tracking through the logo_uri being requested by the client,
+   since the cached file would be served not from the remote URI but
+   instead from a URI that the Authorization server trusts.
 
 7.  IANA Considerations
 
