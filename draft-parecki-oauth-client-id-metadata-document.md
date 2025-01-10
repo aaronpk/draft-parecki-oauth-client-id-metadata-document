@@ -292,6 +292,10 @@ The authors would like to thank the following people for their contributions and
 
 (This appendix to be deleted by the RFC editor in the final specification.)
 
+-02
+
+* Added security consideration around displaying logos to end users
+
 -01
 
 * Added recommendation of max metadata document size
