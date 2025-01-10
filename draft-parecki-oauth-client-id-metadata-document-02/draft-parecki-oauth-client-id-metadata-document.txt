@@ -84,11 +84,12 @@ Table of Contents
      4.4.  Redirect URL Registration
    5.  Authorization Server Metadata
    6.  Security Considerations
-     6.1.  Client Authentication
-     6.2.  OAuth Phishing Attacks
-     6.3.  Server Side Request Forgery (SSRF) Attacks
-     6.4.  Maximum Response Size for Client Metadata Documents
-     6.5.  Displaying Logos to End-Users
+     6.1.  Client ID Metadata Documents for Development Purposes
+     6.2.  Client Authentication
+     6.3.  OAuth Phishing Attacks
+     6.4.  Server Side Request Forgery (SSRF) Attacks
+     6.5.  Maximum Response Size for Client Metadata Documents
+     6.6.  Displaying Logos to End-Users
    7.  IANA Considerations
      7.1.  OAuth Authorization Server Metadata Registry
    8.  References
@@ -132,8 +133,8 @@ Table of Contents
    following restrictions.  Client identifier URLs MUST have an "https"
    scheme, MUST contain a path component, MUST NOT contain single-dot or
    double-dot path segments, MUST NOT contain a fragment component and
-   MUST NOT contain a username or password component.  Client identifier
-   URLs MAY contain a query string component and MAY contain a port.
+   MUST NOT contain a username or password Client identifier URLs SHOULD
+   NOT include a query string component, and MAY contain a port.
 
    This specification places no restrictions on what URL is used as a
    client identifier.  A short URL is RECOMMENDED, since the URL may be
@@ -171,16 +172,28 @@ Table of Contents
    specific content types as long as the response is JSON and conforms
    to application/<AS-defined>+json.
 
-   The token_endpoint_auth_method property MUST NOT include
-   client_secret_post or client_secret_basic, as there is no way to
-   establish a shared secret to be used with these authentication
-   methods.  See Section 6.1 for more details.
+   As there is no way to establish a shared secret to be used with
+   client metadata documents, the following restrictions apply on the
+   contents of the client metadata document:
+
+   *  the token_endpoint_auth_method property MUST NOT include
+      client_secret_post or client_secret_basic
+
+   *  the client_secret and client_secret_expires_at properties MUST NOT
+      be used
+
+   See Section 6.2 for more details.
 
    Other specifications MAY place additional restrictions on the
    contents of the client metadata document accepted by authorization
    servers implementing their specification, for instance, preventing
    the registration of confidential clients by requiring the
    token_endpoint_auth_method property be set to "none".
+
+   TBD: We may want a property such as client_id_expires_at for
+   indicating that the client is ephemeral and not valid after a given
+   timestamp, especially for documents issued by a service for
+   development purposes.
 
 4.2.  Metadata Discovery Errors
 
@@ -238,7 +251,20 @@ Table of Contents
    [RFC6819], and [I-D.draft-ietf-oauth-security-topics] the additional
    considerations apply.
 
-6.1.  Client Authentication
+6.1.  Client ID Metadata Documents for Development Purposes
+
+   When developing applications against a service that uses Client ID
+   Metadata Documents, developers often encounter the issue of "how do I
+   serve a Client ID Metadata Document at a https URL whilst developing
+   my application?".
+
+   For this purpose, it is recommended to either host a document on a
+   webserver somewhere that describes the application under development
+   (e.g., using localhost redirect URIs), or to use a service which can
+   generate and host a Client ID Metadata Document for you.  Such a
+   service should issue URLs that are stable.
+
+6.2.  Client Authentication
 
    Since the client establishes its own registration data at the
    authorization server, prior coordination of client credentials is not
@@ -262,7 +288,7 @@ Table of Contents
    communication with the authorization server MUST include client
    authentication of the registered type.
 
-6.2.  OAuth Phishing Attacks
+6.3.  OAuth Phishing Attacks
 
    Authorization servers SHOULD fetch the client_id metadata document
    provided in the authorization request in order to provide users with
@@ -280,7 +306,7 @@ Table of Contents
    client_id URL is the only piece of information the user has as an
    indication of which application they are authorizing.
 
-6.3.  Server Side Request Forgery (SSRF) Attacks
+6.4.  Server Side Request Forgery (SSRF) Attacks
 
    Authorization servers fetching the client metadata document and
    resolving URLs located in the metadata document should be aware of
@@ -291,7 +317,7 @@ Table of Contents
    possibility that URLs might be non-http-based URI schemes which can
    lead to other possible SSRF attack vectors.
 
-6.4.  Maximum Response Size for Client Metadata Documents
+6.5.  Maximum Response Size for Client Metadata Documents
 
    Authorization servers SHOULD limit the response size when fetching
    the client metadata document, as to avoid denial of service attacks
@@ -299,7 +325,7 @@ Table of Contents
    (memory, disk, database).  The recommended maximum response size for
    client metadata documents is 5 kilobytes.
 
-6.5.  Displaying Logos to End-Users
+6.6.  Displaying Logos to End-Users
 
    Authorization servers that wish to make use of the logo_uri property
    within client metadata document SHOULD prefetch the file at logo_uri
@@ -422,6 +448,15 @@ Document History
    -02
 
    *  Added security consideration around displaying logos to end users
+
+   *  Changed query string parameters in Client ID Metadata Document
+      URLs to "SHOULD NOT", since this encourages bad security practices
+      (e.g., minting documents based on query string parameters)
+
+   *  Added prohibition on the client_secret_expires_at property, as it
+      is not relevant for Client ID Metadata Documents.
+
+   *  Added security consideration for development use-cases.
 
    -01
 
