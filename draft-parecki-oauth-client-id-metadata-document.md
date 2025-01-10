@@ -171,7 +171,7 @@ client metadata document:
 
 * the `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
 or `client_secret_basic`
-* the `client_secret_expires_at` property MUST NOT be used
+* the `client_secret` and `client_secret_expires_at` properties MUST NOT be used
 
 See {{client_authentication}} for more details.
 
