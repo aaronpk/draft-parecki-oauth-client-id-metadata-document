@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-09T00:34:29.891892+00:00",
+  "timestamp": "2025-01-12T00:38:28.157687+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -525,7 +525,7 @@
       "labels": [],
       "body": "If so, how would it impact the size limit of the whole metadata document ?",
       "createdAt": "2024-07-08T17:30:56Z",
-      "updatedAt": "2025-01-06T23:40:19Z",
+      "updatedAt": "2025-01-10T00:38:55Z",
       "closedAt": null,
       "comments": [
         {
@@ -569,6 +569,13 @@
           "body": "I don't specifically call out data uri's in that security consideration, but more that the authorization server shouldn't just be using the `logo_uri` verbatim in their authorization pages, and instead should fetch the resource and cache it, as to serve it from a trusted domain (this would also be inline with having a narrow CSP for `image-src`)",
           "createdAt": "2025-01-06T23:40:18Z",
           "updatedAt": "2025-01-06T23:40:18Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "I agree with the recommendation for the AS to cache and serve the image itself. \r\n\r\nInterestingly, the client providing a data URI and the AS outputting the string verbatim does meet the requirement of not serving 3rd party hosted images \ud83d\ude02 ",
+          "createdAt": "2025-01-10T00:38:54Z",
+          "updatedAt": "2025-01-10T00:38:54Z"
         }
       ]
     },
@@ -654,7 +661,7 @@
       "labels": [],
       "body": "While reading the draft, it currently seems to allow broad use of query parameters in the client_id for sending information that a guides the use of metadata that should be retrieved in the flows. \r\n\r\n> **Client identifier URLs MAY contain a query string component** and MAY contain a port.\r\n> This specification places no restrictions on what URL is used as a client identifier. A short URL is RECOMMENDED, since the URL may be displayed to the end user in the authorization interface or in management interfaces. Usage of a stable URL that does not frequently change for the client is also RECOMMENDED.\r\n\r\n(emphasis mine)\r\n\r\nWe already see some implementations using this to facilitate development by passing OAuth metadata (e.g. `scope `and `redirect_uris`) such as with ATProto's use of OAuth in the [localhost exception case](https://atproto.com/specs/oauth), and as written this may mistakenly encourage the use of dynamically-generated metadata documents from user-given inputs even in non-development use cases which can undermine the mechanisms herein.\r\n\r\ne.g. `client_id: https://someurl.com?scope=scope1%20scope2` is allowed, but should be strongly discouraged outside of local development contexts.\r\n\r\nThis discouragement could fit well in the additional **Security Considerations** I am thinking. Something along the lines \"Authorization servers SHOULD reject the use of query params to dynamically generate metadata outside of development contexts where other methods of generating metadata documents are not practical.\" \r\n\r\nWording probably needs work :P Also reinforces some good ideas I've seen around setting up a service for development metadata documents like in #12 ",
       "createdAt": "2024-11-04T20:07:13Z",
-      "updatedAt": "2025-01-07T18:03:00Z",
+      "updatedAt": "2025-01-10T22:01:25Z",
       "closedAt": null,
       "comments": [
         {
@@ -691,8 +698,114 @@
           "body": "I'd recommend going the route of having a service that registers and serves documents, rather than generating them through query parameters. That way it's just a bit harder to create multiple documents to confuse just by changing URL parameters.\r\n\r\nE.g., by storing that information you can perform validation and moderation on it as necessary.\r\n\r\nThat's why I've gone the route of removing query parameters from the client metadata document URIs.",
           "createdAt": "2025-01-07T18:02:28Z",
           "updatedAt": "2025-01-07T18:03:00Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@aaronpk yeah, I think we can use the `Expires` header for this: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Expires\r\n\r\nPerhaps we just need particular language around this? \"A server responding to a request for a client metadata document MAY return the Expires header, indicating that the given client metadata document expires after a given time, at which point the client should be considered revoked if re-requesting the metadata document URI fails\"",
+          "createdAt": "2025-01-10T17:02:32Z",
+          "updatedAt": "2025-01-10T17:02:32Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Opened #29 with the above.",
+          "createdAt": "2025-01-10T20:50:27Z",
+          "updatedAt": "2025-01-10T20:50:27Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@matthieusieben I would say that what Bluesky is doing with its localhost client_id's is side-stepping this internet draft completely. It is its own thing entirely. This internet draft relies on the ability for the authorization server to request and validate the client_id as being a client metadata document, what you're doing isn't that.",
+          "createdAt": "2025-01-10T20:51:39Z",
+          "updatedAt": "2025-01-10T20:52:31Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "I think you're right. Considering them separate things makes a lot of sense.",
+          "createdAt": "2025-01-10T22:01:23Z",
+          "updatedAt": "2025-01-10T22:01:23Z"
         }
       ]
+    },
+    {
+      "number": 26,
+      "id": "I_kwDOL_Xevs6lpP-s",
+      "title": "Using `client_url` instead of `client_id` in authorize request",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/26",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "After presenting this draft at IETF 121, one concern that came up was how an AS can support both registered and unregistered clients, as well as how an AS can support clients that have different ways to retrieve metadata but might also be represented by a URL. In particular [OpenID Federation](https://openid.net/specs/openid-federation-1_0.html) also uses URLs as client IDs, so there is a potential ambiguity if an AS supports both OpenID Federation and Client ID Metadata Documents, how does it know which method to use to retrieve the client metadata given just a plain URL.\r\n\r\nThis led to the proposal of pulling out the idea of a \"client ID scheme\" from OpenID4VP into its own draft: https://datatracker.ietf.org/doc/draft-parecki-oauth-client-id-scheme/\r\n\r\nI presented this at the interim meeting this week for feedback.\r\n\r\nOne concern that was raised was that an AS might want to avoid any kind of need to parse the client ID. As an alternative, the client metadata URL could be provided in an authorization request using a new parameter `client_url` instead of `client_id`, leaving `client_id` to represent registered clients. (Note that in the example given, the AS would only support preregistered clients and client metadata document clients, but not OpenID Federation or clients using DID URLs like was mentioned in the client ID scheme doc.)\r\n\r\nSo an OAuth authorization request would look like:\r\n\r\n```\r\nhttps://authorization-server.com/authorize?response_type=code&client_url=https://client.example.com/id&scope=etc&...\r\n```\r\n\r\nI wanted to capture this issue here to get feedback on the issue. \r\n\r\n* While this would be a completely breaking change for anyone who has adopted client metadata documents today, are the benefits worth it? \r\n* Do you see yourself wanting to also support preregistered clients at some point?\r\n* Is parsing a client ID a concern for you?",
+      "createdAt": "2025-01-10T01:05:32Z",
+      "updatedAt": "2025-01-10T03:41:43Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "carrvo",
+          "authorAssociation": "NONE",
+          "body": "The main feature that attracted me to IndieAuth in the first place was the ability to avoid preregistration completely. The alternative is dynamic registration but that adds a fair bit of complexity, storage, and I have not seen widely adopted (For example I believe it is not by Microsoft and Google). I keep imagining a decentralized future where many to most decided to self-host their own Identity Provider (IdP).\r\n\r\nI am not sure what all the \"benefits\" spoken of are; but my biggest question is whether the change from `client_id` to `client_url` would effect its compatibility with OAuth clients who are unaware of the IndieAuth backend?",
+          "createdAt": "2025-01-10T03:03:04Z",
+          "updatedAt": "2025-01-10T03:03:04Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "The goal is very much to avoid preregistration. Changing from `client_id` to `client_url` would mean needing to modify any OAuth client library to be usable for IndieAuth, since it would not use the `client_id` parameter anymore.",
+          "createdAt": "2025-01-10T03:05:27Z",
+          "updatedAt": "2025-01-10T03:05:27Z"
+        },
+        {
+          "author": "carrvo",
+          "authorAssociation": "NONE",
+          "body": "Then I would unfortunately be against the change. I have just figured out how to make [mod_oauth2](https://github.com/OpenIDC/mod_oauth2) compatible with IndieAuth and this would break that (they likely would not accept any changes for this).",
+          "createdAt": "2025-01-10T03:41:42Z",
+          "updatedAt": "2025-01-10T03:41:42Z"
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "id": "I_kwDOL_Xevs6lpy5f",
+      "title": "Optional Scope Descriptions as Additional Property in the Client Metadata Document",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/27",
+      "state": "OPEN",
+      "author": "carrvo",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "As a part of the client metadata document\r\n\r\n> The client metadata document URL is a JSON document containing the metadata of the client. The client metadata values are the values defined in the OAuth Dynamic Client Registration Metadata OAuth Parameters registry https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata.\r\n> ...\r\n> The client metadata document MAY define additional properties in the response. The client metadata document MAY also be served with more specific content types as long as the response is JSON and conforms to application/<AS-defined>+json.\r\n\r\nIt would be valuable to non-technical users if it included an optional field that held user-friendly scope descriptions that could be shown during authentication/authorization, where only the scope is included in future tokens (that end users do not typically inspect).\r\n\r\nFitness Example:\r\n```json\r\n{\r\n    \"iss\": \"https://example.com\",\r\n    \"client_id\": \"https://example.com/fitness.json\",\r\n    \"client_uri\": \"https://example.com/fitness.html\",\r\n    \"response_types\": [\"code\"],\r\n    \"grant_types\": [\"authorization_code\"],\r\n    \"scope\": \"fitall:rd fitwe:wt\",\r\n    \"scope_descriptions\": {\r\n        \"fitall:rd\": \"access personal data attributes height, age, weight, and fitness\",\r\n        \"fitwe:wt\": \"modify personal data attribute weight\"\r\n    }\r\n}\r\n```",
+      "createdAt": "2025-01-10T03:32:34Z",
+      "updatedAt": "2025-01-10T03:36:49Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Scopes are defined by the authorization server, not by the client. If the client could provide this information there are a lot of potential phishing attacks possible.",
+          "createdAt": "2025-01-10T03:36:48Z",
+          "updatedAt": "2025-01-10T03:36:48Z"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "id": "I_kwDOL_Xevs6lvLUb",
+      "title": "Add guidance on CORS for Client Metadata Documents",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/28",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I recently saw a developer thinking that their Client Metadata Document needed to be served with the following CORS headers:\r\n\r\n```\r\n// Add CORS headers to allow Bluesky to fetch our metadata\r\n\"Access-Control-Allow-Origin\": \"*\",\r\n\"Access-Control-Allow-Methods\": \"GET, OPTIONS\",\r\n```\r\n\r\nThis shouldn't be necessary unless Bluesky is making requests directly to the client metadata document client-side, though, we'd probably always encourage proxied access (i.e., retrieving the documents' values from the authorization server, not requesting to 3rd-party URLs)",
+      "createdAt": "2025-01-10T16:35:56Z",
+      "updatedAt": "2025-01-10T16:35:56Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -937,24 +1050,26 @@
       "id": "PR_kwDOL_Xevs6G33QO",
       "title": "Improve documentation for development usage, prohibiting query parameters in document URLs",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/24",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "A pattern that we've seen sometimes used is to have a service generate Client ID Metadata Documents by taking in data from query parameters and transposing those into the contents of the document, this should probably be considered an anti-pattern, since it circumvents a fair few of the security properties of stable URLs for client id metadata documents.\r\n\r\nThis is noted in #23 and #12, where workarounds have tried to be developed.\r\n\r\nFor instance, for AtProto / Bluesky, they could host a `client_id.atproto.dev` service which allows you to preregistered a client for development purposes (specifying redirect_uris, scopes, etc), giving back a https URL to a document that you can use for that client.\r\n\r\nWe could expand this to allow a Authorization Server to apply additional constrains on the contents of the client metadata document, based on the hostname of the document itself, e.g., only documents on `client_id.atproto.dev` hostname can include redirect URIs that are localhost URIs.",
       "createdAt": "2025-01-06T23:13:20Z",
-      "updatedAt": "2025-01-06T23:20:06Z",
+      "updatedAt": "2025-01-10T00:50:49Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
-      "baseRefOid": "bab0ab4639cf551b97cfec860b0512a55927d790",
+      "baseRefOid": "e2fa17b9615df7cb76e04a2a143f9b45fcd6fe00",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "feat/improve-development-usage",
-      "headRefOid": "1dd3a573a598c58997ed96b7d35a875d25f3fe7b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "e3a35cd4f9ee880b8acab2e1454ba2c4ebd38d4d",
+      "closedAt": "2025-01-10T00:50:48Z",
+      "mergedAt": "2025-01-10T00:50:48Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "d69da84351a89d8db86ee5c72703a10bd11d5965"
+      },
       "comments": [
         {
           "author": "ThisIsMissEm",
@@ -1024,6 +1139,106 @@
               "updatedAt": "2025-01-06T23:20:12Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6XeCrH",
+          "commit": {
+            "abbreviatedOid": "f3cabd0"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-10T00:31:57Z",
+          "updatedAt": "2025-01-10T00:31:58Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Was it intentional to just remove the mention of a query string component, rather than say \"MUST NOT\" include a query string component?",
+              "createdAt": "2025-01-10T00:31:57Z",
+              "updatedAt": "2025-01-10T00:31:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6XeFQI",
+          "commit": {
+            "abbreviatedOid": "f3cabd0"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-10T00:36:19Z",
+          "updatedAt": "2025-01-10T00:36:19Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "hmm, I'm not sure what would be best? maybe \"SHOULD NOT\" ? The idea is to discourage usage as much as possible.",
+              "createdAt": "2025-01-10T00:36:19Z",
+              "updatedAt": "2025-01-10T00:36:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6XeImz",
+          "commit": {
+            "abbreviatedOid": "f3cabd0"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-10T00:42:05Z",
+          "updatedAt": "2025-01-10T00:42:05Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "\"SHOULD NOT\" would be in line with the comment here https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/23#issuecomment-2575500904",
+              "createdAt": "2025-01-10T00:42:05Z",
+              "updatedAt": "2025-01-10T00:42:05Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6XeJIg",
+          "commit": {
+            "abbreviatedOid": "f3cabd0"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-10T00:43:02Z",
+          "updatedAt": "2025-01-10T00:43:02Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Let's add \"SHOULD NOT\" here and merge this in for publishing version -02 today",
+              "createdAt": "2025-01-10T00:43:02Z",
+              "updatedAt": "2025-01-10T00:43:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs6XeKhQ",
+          "commit": {
+            "abbreviatedOid": "f3cabd0"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-10T00:45:35Z",
+          "updatedAt": "2025-01-10T00:45:35Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "```suggestion\r\nClient identifier URLs SHOULD NOT include a query string component, and MAY contain a port.\r\n```",
+              "createdAt": "2025-01-10T00:45:35Z",
+              "updatedAt": "2025-01-10T00:45:35Z"
+            }
+          ]
         }
       ]
     },
@@ -1032,24 +1247,26 @@
       "id": "PR_kwDOL_Xevs6G38Le",
       "title": "Add security consideration for logo_uri usage",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/25",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I'm not 100% happy with the wording here, but this does begin to address the concerns around displaying logos to end-users that are provided from within the client metadata document.\r\n\r\nThe idea is to provide a security consideration similar to the consideration in Dynamic Client Registration: https://www.rfc-editor.org/rfc/rfc7591.html#section-5\r\n\r\n> In a situation where the authorization server is supporting open client registration, it must be extremely careful with any URL provided by the client that will be displayed to the user (e.g., \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\").  For instance, a rogue client could specify a registration request with a reference to a drive-by download in the \"policy_uri\", enticing the user to click on it during the authorization.  The authorization server SHOULD check to see if the \"logo_uri\", \"tos_uri\", \"client_uri\", and \"policy_uri\" have the same host and scheme as the those defined in the array of \"redirect_uris\" and that all of these URIs resolve to valid web pages.  Since these URI values that are intended to be displayed to the user at the authorization page, the authorization server SHOULD protect the user from malicious content hosted at the URLs where possible.  For instance, before presenting the URLs to the user at the authorization page, the authorization server could download the content hosted at the URLs, check the content against a malware scanner and blacklist filter, determine whether or not there is mixed secure and non-secure content at the URL, and other possible server-side mitigations.  Note that the content in these URLs can change at any time and the authorization server cannot provide complete confidence in the safety of the URLs, but these practices could help.  To further mitigate this kind of threat, the authorization server can also warn the user that the URL links have been provided by a third party, should be treated with caution, and are not hosted by the authorization server itself.  For instance, instead of providing the links directly in an HTML anchor, the authorization server can direct the user to an interstitial warning page before allowing the user to continue to the target URL\r\n\r\nPerhaps the section should be also including `tos_uri`, `policy_uri` and `client_uri` (e.g., asserting that the Authorization Server can choose to validate the documents at these URIs and also choose whether or not to display these URIs to the end-user.",
       "createdAt": "2025-01-06T23:38:22Z",
-      "updatedAt": "2025-01-07T18:00:33Z",
+      "updatedAt": "2025-01-10T00:33:02Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "bab0ab4639cf551b97cfec860b0512a55927d790",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "feat/add-consideration-for-logo_uri",
       "headRefOid": "8fc35a65f0381e6b6ab3675b2cf3b5914e193289",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-01-10T00:33:02Z",
+      "mergedAt": "2025-01-10T00:33:02Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "6158b5ef98a28272cfe77ed496f7dcfad53cedb3"
+      },
       "comments": [
         {
           "author": "matthieusieben",
@@ -1064,9 +1281,63 @@
           "body": "@matthieusieben the maximum response size is only for the metadata document itself, not any image resources referenced by it. For those, you would likely need to determine your own appropriate limits. (I'd say < 1mb)",
           "createdAt": "2025-01-07T18:00:31Z",
           "updatedAt": "2025-01-07T18:00:31Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "I think this is a good start in any case.",
+          "createdAt": "2025-01-10T00:32:59Z",
+          "updatedAt": "2025-01-10T00:32:59Z"
         }
       ],
       "reviews": []
+    },
+    {
+      "number": 29,
+      "id": "PR_kwDOL_Xevs6HYRv_",
+      "title": "Improve documentation for development usage and expiration of clients",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/29",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This is as was discussed in https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/23#issuecomment-2583274006\r\n\r\nI did also add the restriction that the client metadata document response must be with a HTTP 200 OK status code, i.e., 3xx or 201 or other status codes should not be considered valid.\r\n\r\nAlso moved the development purposes section up from Security Considerations to the main part of the document.",
+      "createdAt": "2025-01-10T20:15:10Z",
+      "updatedAt": "2025-01-10T20:16:03Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "d69da84351a89d8db86ee5c72703a10bd11d5965",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "feat/client-revocation",
+      "headRefOid": "7de39c44c0cdab97f572c27b521d3848a5fd6653",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOL_Xevs6XnXwG",
+          "commit": {
+            "abbreviatedOid": "7de39c4"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-01-10T20:16:02Z",
+          "updatedAt": "2025-01-10T20:16:03Z",
+          "comments": [
+            {
+              "originalPosition": 43,
+              "body": "I am really strongly encouraging this over the alternative of just sticking the document anywhere on the web with a public URL for development purposes.",
+              "createdAt": "2025-01-10T20:16:02Z",
+              "updatedAt": "2025-01-10T20:16:03Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
