@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-14T00:32:48.887950+00:00",
+  "timestamp": "2025-01-16T00:33:31.307062+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -772,15 +772,15 @@
       "id": "I_kwDOL_Xevs6lpy5f",
       "title": "Optional Scope Descriptions as Additional Property in the Client Metadata Document",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/27",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "carrvo",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "As a part of the client metadata document\r\n\r\n> The client metadata document URL is a JSON document containing the metadata of the client. The client metadata values are the values defined in the OAuth Dynamic Client Registration Metadata OAuth Parameters registry https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata.\r\n> ...\r\n> The client metadata document MAY define additional properties in the response. The client metadata document MAY also be served with more specific content types as long as the response is JSON and conforms to application/<AS-defined>+json.\r\n\r\nIt would be valuable to non-technical users if it included an optional field that held user-friendly scope descriptions that could be shown during authentication/authorization, where only the scope is included in future tokens (that end users do not typically inspect).\r\n\r\nFitness Example:\r\n```json\r\n{\r\n    \"iss\": \"https://example.com\",\r\n    \"client_id\": \"https://example.com/fitness.json\",\r\n    \"client_uri\": \"https://example.com/fitness.html\",\r\n    \"response_types\": [\"code\"],\r\n    \"grant_types\": [\"authorization_code\"],\r\n    \"scope\": \"fitall:rd fitwe:wt\",\r\n    \"scope_descriptions\": {\r\n        \"fitall:rd\": \"access personal data attributes height, age, weight, and fitness\",\r\n        \"fitwe:wt\": \"modify personal data attribute weight\"\r\n    }\r\n}\r\n```",
       "createdAt": "2025-01-10T03:32:34Z",
-      "updatedAt": "2025-01-10T03:36:49Z",
-      "closedAt": null,
+      "updatedAt": "2025-01-16T00:09:12Z",
+      "closedAt": "2025-01-15T22:50:39Z",
       "comments": [
         {
           "author": "aaronpk",
@@ -788,6 +788,41 @@
           "body": "Scopes are defined by the authorization server, not by the client. If the client could provide this information there are a lot of potential phishing attacks possible.",
           "createdAt": "2025-01-10T03:36:48Z",
           "updatedAt": "2025-01-10T03:36:48Z"
+        },
+        {
+          "author": "carrvo",
+          "authorAssociation": "NONE",
+          "body": "I don't think that I follow. The client would be requesting scopes that a resource server would understand. At least for [SelfAuth](https://github.com/Inklings-io/selfauth)+[MinToken](https://github.com/Zegnat/php-mintoken) the authorization server neither defines nor understands the scopes (except `profile` and `email`) and merely reflects the scopes approved back in the token. I welcome a correction to my understanding which is that scopes are defined and understood on a per-application basis.\r\n\r\nI also don't understand why there would be phishing attacks. The client must already request the scopes (and therefore know the scope names); and the client, after retrieving the information or performing the action against the server who defined those scopes, must have an understanding of what it is using the scopes to accomplish. With regards to an attack vector, I expect that this poses risk of HTML/script injection if the authorization server decides (completely optional) to display the values without sanitizing it. I don't see the phishing angle since this information would be used at the point of granting a client (malicious or valid) access to scopes; and to display the client-provided additional information about said scopes does not skip the user's choice to grant (and the user should be checking the client ID for malicious clients) access--access that they would potentially grant without this feature.\r\n\r\nIf it is really such a security issue I am not against closing and forgetting. This is never meant to be more than optionally user-friendly anyway.",
+          "createdAt": "2025-01-15T00:30:07Z",
+          "updatedAt": "2025-01-15T00:30:07Z"
+        },
+        {
+          "author": "carrvo",
+          "authorAssociation": "NONE",
+          "body": "An example of displaying scope descriptions, but is hard-coded on the authorization server for a particular client is https://github.com/capjamesg/jamesg-indieauth",
+          "createdAt": "2025-01-15T00:38:08Z",
+          "updatedAt": "2025-01-15T00:38:08Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Scopes are ultimately defined by the resource server, so some authorization server products take a more \"hands off\" approach than others and either blindly pass through the client-requested scopes into the access token, or allow the admin to configure policies at the authorization server based on scopes. More typical consumer scenarios have the AS define and control everything having to do with scopes. But in any case, the client can't be the one providing the descriptions of the scopes to the end user, that defeats the entire purpose of the authorization server asking the user if it's ok for this client to get the scopes it asked for. If the client can provide its own descriptions of what it's asking for, the client could define the description of the \"delete\" scope as \"read-only access\" which would be shown by the AS on the consent screen. \r\n\r\n",
+          "createdAt": "2025-01-15T00:49:56Z",
+          "updatedAt": "2025-01-15T00:49:56Z"
+        },
+        {
+          "author": "carrvo",
+          "authorAssociation": "NONE",
+          "body": "That is a lot more clear (especially the description of \"delete\" example). It suggests that I should be looking at passing a resource server ID (URL) so that the authorization server can find the descriptions from the appropriate source, and potentially return it as an `aud` claim too. So my idea is still valid, just needs to be a different server's metadata.",
+          "createdAt": "2025-01-15T22:50:23Z",
+          "updatedAt": "2025-01-15T22:50:23Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Yep, two links to point you in the right direction:\r\n\r\n* [Resource Server Metadata](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata) (although it does not provide a means to include a description of the scopes, just the scopes values themselves)\r\n* [Resource Indicators](https://www.rfc-editor.org/rfc/rfc8707) (adds a `resource` parameter to the authorization request like you described)",
+          "createdAt": "2025-01-16T00:09:12Z",
+          "updatedAt": "2025-01-16T00:09:12Z"
         }
       ]
     },
@@ -803,9 +838,24 @@
       "labels": [],
       "body": "I recently saw a developer thinking that their Client Metadata Document needed to be served with the following CORS headers:\r\n\r\n```\r\n// Add CORS headers to allow Bluesky to fetch our metadata\r\n\"Access-Control-Allow-Origin\": \"*\",\r\n\"Access-Control-Allow-Methods\": \"GET, OPTIONS\",\r\n```\r\n\r\nThis shouldn't be necessary unless Bluesky is making requests directly to the client metadata document client-side, though, we'd probably always encourage proxied access (i.e., retrieving the documents' values from the authorization server, not requesting to 3rd-party URLs)",
       "createdAt": "2025-01-10T16:35:56Z",
-      "updatedAt": "2025-01-10T16:35:56Z",
+      "updatedAt": "2025-01-14T16:02:17Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "`GET` requests like this should not be pre-flighted though. Or am I missing something ?\r\n \r\nSimilarly, it seems odd that a browser app needs to download the client metadata. It would probably be more efficient to \"burn\" the needed values in the browser app at build time. And even if the client app did request the client metadata, it is a client implementation detail how these metadata are made available.\r\n\r\nSince the client metadata document is actually only really meant to be loaded from an oauth server, I would even argue that CORS requests from unknown origins should blocked. There is no point in allowing to load a client metadata from a web browser on a third party origin.\r\n\r\nWe could even require the server hosting the document to check for `sec-fetch-*` headers to prevent being loaded from a browser on an unknown origin.",
+          "createdAt": "2025-01-14T14:35:36Z",
+          "updatedAt": "2025-01-14T14:40:38Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'm not sure, there isn't any reason I can think of that a page in the browser would need to GET the client metadata document, unless someone was doing something unsafe on the authorization server side.",
+          "createdAt": "2025-01-14T16:02:15Z",
+          "updatedAt": "2025-01-14T16:02:15Z"
+        }
+      ]
     }
   ],
   "pulls": [
