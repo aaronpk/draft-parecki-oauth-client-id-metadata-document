@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-01-19T00:36:34.831980+00:00",
+  "timestamp": "2025-01-21T00:33:13.641756+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -854,6 +854,86 @@
           "body": "I'm not sure, there isn't any reason I can think of that a page in the browser would need to GET the client metadata document, unless someone was doing something unsafe on the authorization server side.",
           "createdAt": "2025-01-14T16:02:15Z",
           "updatedAt": "2025-01-14T16:02:15Z"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "I_kwDOL_Xevs6m0JGa",
+      "title": "Client metadata retrieval can be abused to make server issued requests",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/30",
+      "state": "OPEN",
+      "author": "matthieusieben",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "This issue was initially reported by @DavidBuchanan314 in https://github.com/bluesky-social/atproto/issues/3396.\n\nIn a federated network, in which hosts are known (as are PDS in the atproto network), the fact that OAuth Server will try to `GET` the client metadata can be used to faking traffic from a bunch of fake IPs, simply by forging authorization requests using the `client_id` as parameter.\n\nFor example, by forging the following requests:\n\n- `https://<pds_1>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_2>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_3>/oauth/authorize?client_id=https://example.com/page_1&...`\n\nThe website at `https://example.com/page_1` will see `GET` traffic from the IPs of all those hosts.\n\nPossible mitigations:\n- Retrieve the metadata document *after* the user authorized the request (though that could lead to weird UX & DX)\n- Add strong constraint on the URI format (eg. `.well-known`, \"must end with `.json`\", other...)\n- ~Recommend OAuth servers to remember the origins of previously failed metadata document retrieval, and prevent more call to be made on these origins~ (redacted: could be abused to cause DoS on legitimate services)\n- Other",
+      "createdAt": "2025-01-20T09:23:25Z",
+      "updatedAt": "2025-01-20T13:32:26Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "DavidBuchanan314",
+          "authorAssociation": "NONE",
+          "body": "I don't think delaying the retrieval needs to have weird UX - It doesn't need to be be delayed until after authorization as a whole, just the initial user authentication phase.\n\nConsider a hypothetical sequence of events when `https://<pds_1>/oauth/authorize?client_id=https://example.com/page_1&...` is visited in a fresh browser session with no cookies, by a legitimate user of `<pds_1>` (but `example.com` is not a valid client application):\n\n1. Browser navigates to `https://<pds_1>/oauth/authorize?client_id=https://example.com/page_1&...`\n2. User is presented with a login form (at this point they're logging into their PDS itself, not authorizing a client application, yet).\n3. User submits their credentials to the PDS (i.e. the authorization server).\n4. The authorization server verifies the user's credentials, and *then* fetches `https://example.com/page_1`.\n5. The user is presented with an error message (since `https://example.com/page_1` was not valid client metadata) (if the metadata *was* valid, this is when the user would be prompted to grant the necessary scopes)\n\nThe user had to wait a few extra steps before seeing an error message (as opposed to immediately), but this flow should be rare in the first place - I can only see it happening to normal users if there was a bug in a legitimate client application that caused its client metadata to become invalid/unavailable. If the user already had a valid session cookie with the PDS (\"remember me on this device\"), they'd still get to see the error message immediately.\n\nOn the happy path (where the client_id resolved to valid client metadata) there shouldn't be any change to the UX at all.\n\nI'm implementing my deferred-retrieval approach here https://github.com/DavidBuchanan314/millipds/pull/42 (currently very WIP, messy code with lots of missing checks and validation - but the main flow is there)\n\nI'd also be in favour of stronger constraints on the URI (`.well-known` in particular, now that you mention it), since it would give greater peace of mind with respect to mitigating SSRF etc. (mitigating SSRF properly is fiddly and is often done wrong)",
+          "createdAt": "2025-01-20T11:22:16Z",
+          "updatedAt": "2025-01-20T11:22:16Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Could this possibly be a bit of a weird interplay between PAR and this I-D? I think PAR would mandate fetching during creation of the PAR (since iirc it needs to verify scopes and such whilst creating the PAR)\n\nNormally I'd say that it should happen pre-Authorization, i.e., during the `GET /oauth/authorize` request handling, which is at point of user interaction.\n\nThe AS is free to (and encouraged to cache responses), though we do currently say errors shouldn't be cached. Maybe we should change that to specify HTTP 4xx errors should be cached?\n\nWe've already changed the request for metadata to a \"MUST return HTTP 200 Ok\"",
+          "createdAt": "2025-01-20T12:27:55Z",
+          "updatedAt": "2025-01-20T12:27:55Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Well, I guess that even with PAR, the metadata validation (including scopes verification) could be deferred to the authorization process.\n\nThe \"weird UX\" I'm referring to is more of a \"weired DX\". The client developer won't get a properly formatted `error` & `error_description` error response (during PAR, or as authorization response). Instead, they would get a visual error during the OAuth flow. This might be fine if we agree that causing un-wanted HTTP traffic to be generated from the server is a worse thing.",
+          "createdAt": "2025-01-20T12:48:53Z",
+          "updatedAt": "2025-01-20T12:49:29Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Wouldn't the PAR request itself fetch the client metadata document if necessary? So you could track failed par requests per IP & ban them, and also return the error at that point.\n\nThough for non-PAR, yes, the flow is usually \"fetch the document during authorisation flow post authentication\" ",
+          "createdAt": "2025-01-20T12:54:33Z",
+          "updatedAt": "2025-01-20T12:54:33Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "PAR can be seen as \"just\" a way to send the authorizations parameters to the servers using a POST request instead of GET query string parameters. The validation of the PAR parameters could technically still be delayed, including banning some IP based on the auth flow result.\n\nAnother \"Weird\" behavior that users might encounter is that the [authorization interface](https://www.oauth.com/oauth2-servers/authorization/requiring-user-login/) typically shows: \"Authorize app XYZ to access your account\".\n\nShowing the app name before the user logs in would not be doable without fetching the metadata.\n",
+          "createdAt": "2025-01-20T13:01:33Z",
+          "updatedAt": "2025-01-20T13:04:27Z"
+        },
+        {
+          "author": "DavidBuchanan314",
+          "authorAssociation": "NONE",
+          "body": "Perhaps validation could be done early *if* the client metadata (or failure response) is already cached. This would improve DX marginally, in that you'd get a better error message on the second attempt.\n\nThe current [atproto oauth docs](https://atproto.com/specs/oauth) mention:\n\n>  Service operators may maintain a list of \"trusted\" client_id values and display the extra metadata for those apps only.\n\nYou could do the \"Authorize app XYZ to access your account\" UI pre-login only for these trusted apps (or maybe any \"seen before\" app). The message for unrecognized apps can be something a bit more \"scary\" and that's probably a good thing.",
+          "createdAt": "2025-01-20T13:09:59Z",
+          "updatedAt": "2025-01-20T13:09:59Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "When it comes to caching, I guess that the first thing would be to try and respect `cache-control` headers (though an attacker could bypass the cache by overloading it so that the targetted url gets eventually evicted from the cache). Legitimate client devs can use short TTL for the document metadata.\n\nThe issue here, I guess, is with 200 OK - NON JSON - responses (either without `cache-control`, or with URL that got evicted from the cache). If the response is 200 OK but obviously not a JSON metadata document, the related ~`origin`~ `URL` (redacted, see [comment bellow](https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/30#issuecomment-2602412248)) could be \"banned\" for some period of time, independent of the `cache-control`",
+          "createdAt": "2025-01-20T13:12:59Z",
+          "updatedAt": "2025-01-20T13:23:43Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "The \"trusted clients\" Atproto mentions means \"manually pre-approved by the PDS owner\", and not \"previously seen clients\".\n\nI don't like the idea of showing a different UX when a client is not known by a PDS as lamdba users will come to wonder why the interface is suddenly different. It could have pricacy implication too (e.g. on PDS with small number of users, you can determine if the other users have used some client by checking which UX you get when trying to use them yourself).",
+          "createdAt": "2025-01-20T13:19:49Z",
+          "updatedAt": "2025-01-20T13:19:49Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Banning by origin doesn't make much sense to me, as a single host _could_ have multiple client metadata documents served by it. \n\nTake for example the Development use case, if I send the request as `client_id=https://clients.atproto.dev/123` but my `client_id` generated was actually `https://clients.atproto.dev/456`, because 123 failed, you'd end up banning all of `clients.atproto.dev` even though it does actually have valid clients.",
+          "createdAt": "2025-01-20T13:20:07Z",
+          "updatedAt": "2025-01-20T13:20:24Z"
         }
       ]
     }
