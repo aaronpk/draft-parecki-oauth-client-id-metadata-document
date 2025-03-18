@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-16T00:39:34.954064+00:00",
+  "timestamp": "2025-03-18T00:36:07.857184+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -934,6 +934,37 @@
           "body": "Banning by origin doesn't make much sense to me, as a single host _could_ have multiple client metadata documents served by it. \n\nTake for example the Development use case, if I send the request as `client_id=https://clients.atproto.dev/123` but my `client_id` generated was actually `https://clients.atproto.dev/456`, because 123 failed, you'd end up banning all of `clients.atproto.dev` even though it does actually have valid clients.",
           "createdAt": "2025-01-20T13:20:07Z",
           "updatedAt": "2025-01-20T13:20:24Z"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "id": "I_kwDOL_Xevs6uU574",
+      "title": "Omit `client_id` from client metadata document?",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/31",
+      "state": "OPEN",
+      "author": "jogu",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Current spec says:\n\n> The client metadata document MUST contain a client_id property whose value MUST compare and match the URL of the document using simple string comparison as defined in [[RFC3986](https://www.ietf.org/archive/id/draft-parecki-oauth-client-id-metadata-document-02.html#RFC3986)] Section 6.2.1.\n\nI'm not sure of the reason this text is here, so perhaps there's a good reason?\n\nThere's definitely an argument against including `client_id` in the metadata document though. We've seen that implementations of https://datatracker.ietf.org/doc/html/rfc8414 often just blindly trust the `issuer` value in the metadata document, without verifying it matches the location they retrieved it from. Omitting `client_id` (by requiring it is not be present and must be ignored if present) from the metadata document sort of completely removes the possibility to do that.\n\nThe only downside I can think of is that if the metadata document is somehow getting exposed at multiple urls (https://example.com/client.json and https://www.example.com/client.json for example) then both would end up being valid client ids. I'm not sure if that's bad though?\n",
+      "createdAt": "2025-03-17T11:26:12Z",
+      "updatedAt": "2025-03-17T12:53:48Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "This property matching prevents many rehosting attacks or using redirects to mislead users. It is a key requirement in this specification.",
+          "createdAt": "2025-03-17T11:41:13Z",
+          "updatedAt": "2025-03-17T11:41:13Z"
+        },
+        {
+          "author": "jogu",
+          "authorAssociation": "NONE",
+          "body": "> This property matching prevents many rehosting attacks or using redirects to mislead users. It is a key requirement in this specification.\n\nOmitting client_id from the metadata document and matching the one in the authorization request to the location the file is retrieved from also prevents those attacks though I think - could you give a specific example of an attack please?\n\n(I'm not sure I understand the problem with redirects - is there a situation where we expect the attacker to be able to create redirects for some particular url but not create a file from that same url? I think the redirects case is actually undefined in the current spec, I don't see anything that says if redirects should be followed or not / if they are followed I'm not sure if it's the original requested url or the final one that should be considered the \"url of the document was\")\n\nIn practice in the OAuth world we've seen similar checks to the one for this value being implemented very poorly or not at all, so if it's a critical security mechanism that's bad. The only slight advantage here is that this value is being checked by the AS so there's at least fewer of them compared to clients...",
+          "createdAt": "2025-03-17T12:53:47Z",
+          "updatedAt": "2025-03-17T12:53:47Z"
         }
       ]
     }
