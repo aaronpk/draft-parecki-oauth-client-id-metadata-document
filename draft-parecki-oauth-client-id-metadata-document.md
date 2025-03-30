@@ -36,6 +36,10 @@ normative:
   RFC7591:
   RFC8414:
   I-D.draft-ietf-oauth-security-topics:
+  I-D.draft-parecki-oauth-client-id-prefix:
+    title: "OAuth 2.0 Client ID Prefix"
+    target: https://drafts.aaronpk.com/oauth-client-id-prefix/draft-parecki-oauth-client-id-prefix.html
+    date: 2025-04-24
 
 informative:
   IndieAuth:
@@ -127,17 +131,27 @@ at each authorization server.
 
 # Client Identifier
 
-This specification defines the client identifier as a URL with the following
-restrictions. Client identifier URLs MUST have an "https" scheme, MUST contain a
-path component, MUST NOT contain single-dot or double-dot path segments, MUST
-NOT contain a fragment component and MUST NOT contain a username or password
-Client identifier URLs SHOULD NOT include a query string component, and MAY contain a port.
+This specification defines the `client-id-metadata-document` prefix for OAuth 2.0
+Client Identifiers, per {{I-D.draft-parecki-oauth-client-id-prefix}}.
+
+This Client Identifier scheme can also use bare `https://` URLs for backwards
+compatibility with previous versions of this specification and the prior-art
+upon which this specification is based (i.e., [Solid-OIDC]), however, this is discouraged.
+
+This specification defines the Client Identifier as a string starting with
+`client-id-metadata-document:` followed by a URL (the client ID metadata
+document URL) with the following restrictions:
+
+* The URL MUST have a "https" scheme, MUST contain a path component, MUST NOT contain single-dot or
+double-dot path segments, MUST NOT contain a fragment component and MUST NOT
+contain a username or password.
+* The URL SHOULD NOT include a query string component, and MAY contain a port.
 
 This specification places no restrictions on what URL is used as
 a client identifier. A short URL is RECOMMENDED, since the URL may
 be displayed to the end user in the authorization interface or in
 management interfaces. Usage of a stable URL that does not frequently
-change for the client is also RECOMMENDED.
+change for the client is RECOMMENDED.
 
 # Client Information Discovery
 
@@ -147,27 +161,45 @@ can be used during an OAuth flow, such as presenting information about
 the client to the user in an authorization consent screen, for example the
 client name and logo.
 
-The authorization server SHOULD fetch the document indicated by the `client_id`
-to retrieve the client registration information.
+The authorization server MUST check that the `client_id` starts with
+`client-id-metadata-document:` and then fetch the document indicated by the
+URL that follows to retrieve the client registration information.
 
-## Client Metadata
+The authorization server MAY allow following this specification and fetching the
+client ID metadata document using a bare `https://` URL as the `client_id`,
+however this is discouraged in favour of using the client ID prefix scheme.
 
-The client metadata document URL is a JSON document containing the metadata
+The authorization server SHOULD respect `cache-control` headers returned by the
+HTTP request for the Client ID Metadata Document. For more information see
+{{client-metadata-caching}}.
+
+## Client Metadata Documents
+
+The client ID metadata document URL is a JSON document containing the metadata
 of the client. The client metadata values are the values defined in
 the OAuth Dynamic Client Registration Metadata OAuth Parameters registry
 <https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata>.
 
 The client metadata document MUST contain a `client_id` property whose value
-MUST compare and match the URL of the document using simple string comparison as
+MUST compare and match the URL of the document prefixed with
+`client-id-metadata-document:` using simple string comparison as defined in
+[RFC3986] Section 6.2.1.
+
+If the `client_id` used with the authorization server does not use the
+`client-id-metadata-document:` scheme, then the `client_id` property MUST
+compare and match the URL of the document using simple string comparison as
 defined in [RFC3986] Section 6.2.1.
 
 The client metadata document MAY define additional properties in the response.
 The client metadata document MAY also be served with more specific content types
 as long as the response is JSON and conforms to `application/<AS-defined>+json`.
 
+All URLs contained within the Client ID Metadata Document must be absolute and
+SHOULD NOT use the `data:` or `javascript:` scheme.
+
 As there is no way to establish a shared secret to be used with client metadata
-documents, the following restrictions apply on the contents of the
-client metadata document:
+documents, the following restrictions apply on the contents of the client metadata
+document:
 
 * the `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
 or `client_secret_basic`
@@ -176,21 +208,25 @@ or `client_secret_basic`
 See {{client_authentication}} for more details.
 
 Other specifications MAY place additional restrictions on the contents of the
-client metadata document accepted by authorization servers implementing their
+client ID metadata document accepted by authorization servers implementing their
 specification, for instance, preventing the registration of confidential clients
 by requiring the `token_endpoint_auth_method` property be set to `"none"`.
 
 TBD: We may want a property such as `client_id_expires_at` for indicating that the client is ephemeral and not valid after a given timestamp, especially for documents issued by a service for development purposes.
 
-## Metadata Discovery Errors
+## Client Metadata Discovery Errors
 
 If fetching the metadata document fails, the authorization server SHOULD abort the
 authorization request.
 
-## Metadata Caching
+## Client Metadata Caching {#client-metadata-caching}
 
 The authorization server MAY cache the client metadata it discovers at the
-client metadata document URL.
+client metadata document URL. The authorization server SHOULD respect the
+cache-control headers returned by the server serving the client ID metadata
+document.
+
+TBD: Is there an RFC we should reference with regards to cache-control headers?
 
 TBD: recommend a cache lifetime? considerations about stale data?
 
@@ -221,6 +257,9 @@ Authorization servers that publish Authorization Server Metadata {{RFC8414}} MUS
 
 This enables clients to avoid sending the user to a dead end, by only redirecting the user to an authorization server that supports this specification. Otherwise, the client would redirect the user and the user would be met with an error about an invalid client as described by Section 4.1.2.1 of {{RFC6749}}.
 
+The `client_id_prefixes_supported` property of the Authorization Server Metadata {{RFC8414}} SHOULD include `client-id-metadata-document` if following {{I-D.draft-parecki-oauth-client-id-prefix}}.
+
+TBD: Do we need this paragraph, or is defining it in the IANA considerations enough?
 
 # Security Considerations
 
@@ -283,11 +322,21 @@ Caching of the `logo_uri` response can additionally prevent cross-domain trackin
 
 The following authorization server metadata value is defined by this specification and registered in the IANA "OAuth Authorization Server Metadata" registry established in OAuth 2.0 Authorization Server Metadata [RFC8414].
 
-* Metadata Name: `client_id_metadata_document_supported`:
+* Metadata Name: `client_id_metadata_document_supported`
 * Metadata Description: JSON boolean value specifying whether the authorization server supports retrieving client metadata from a `client_id` URL.
 * Change Controller: IETF
 * Specification Document: {{as-metadata}} of {{&SELF}}
 
+## OAuth Client ID Prefix
+
+TBD: Is there a registry for these values?
+
+The following value is defined for the {{I-D.draft-parecki-oauth-client-id-prefix}} scheme is defined:
+
+* Name: `client-id-metadata-document`
+* Description: Indicates support for the Client ID Metadata Documents specification.
+* Change Controller: IETF
+* Specification Document: {{I-D.draft-parecki-oauth-client-id-prefix}} and {{&SELF}}
 
 
 --- back
@@ -304,6 +353,12 @@ The authors would like to thank the following people for their contributions and
 {:numbered="false"}
 
 (This appendix to be deleted by the RFC editor in the final specification.)
+
+-03
+
+* Reworked for {{I-D.draft-parecki-oauth-client-id-prefix}}
+* Added caching considerations
+* Added restrictions on URLs contained within Client ID Metadata Documents.
 
 -02
 
