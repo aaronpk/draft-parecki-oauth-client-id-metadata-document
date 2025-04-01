@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-30T00:40:37.303532+00:00",
+  "timestamp": "2025-04-01T00:42:45.696573+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -314,7 +314,7 @@
       "labels": [],
       "body": "We've currently a restriction for `client_id` URIs that they MUST be https scheme. \r\n\r\nIn development environments where all software is running on localhost, we should probably provide an exception to that rule, given the issues that can be faced (self-signed certificates, custom root certificates, etc) with settings up HTTPS in development.",
       "createdAt": "2024-07-03T11:53:42Z",
-      "updatedAt": "2024-08-24T21:41:09Z",
+      "updatedAt": "2025-03-30T14:54:19Z",
       "closedAt": null,
       "comments": [
         {
@@ -414,6 +414,13 @@
           "body": "Yeah, I think the current language was written such that it worked first for production environments, which tbh makes sense & in that scenario typically the AS and Client app are not operated by the same entity ",
           "createdAt": "2024-08-24T21:41:09Z",
           "updatedAt": "2024-08-24T21:41:09Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think we can close this as won't fix, as we're now recommending using a development service to provide a Client ID Metadata Document at a stable public URL. There is absolutely no way an Authorization Server can request a document from localhost (unless it's also on localhost), and we've made changes in #24 to prohibit query parameters in Client ID Metadata Document URLs.\n\nThese two aspects mean what Bluesky is doing with their development Client IDs is completely outside of the bounds of this specification, and I'd encourage them to set up a client ID development server which can publicly host Client ID Metadata Documents for developers at stable URLs (you could use the sha256 hash of the client ID document as the `client_id` URL)",
+          "createdAt": "2025-03-30T14:54:17Z",
+          "updatedAt": "2025-03-30T14:54:17Z"
         }
       ]
     },
@@ -661,7 +668,7 @@
       "labels": [],
       "body": "While reading the draft, it currently seems to allow broad use of query parameters in the client_id for sending information that a guides the use of metadata that should be retrieved in the flows. \r\n\r\n> **Client identifier URLs MAY contain a query string component** and MAY contain a port.\r\n> This specification places no restrictions on what URL is used as a client identifier. A short URL is RECOMMENDED, since the URL may be displayed to the end user in the authorization interface or in management interfaces. Usage of a stable URL that does not frequently change for the client is also RECOMMENDED.\r\n\r\n(emphasis mine)\r\n\r\nWe already see some implementations using this to facilitate development by passing OAuth metadata (e.g. `scope `and `redirect_uris`) such as with ATProto's use of OAuth in the [localhost exception case](https://atproto.com/specs/oauth), and as written this may mistakenly encourage the use of dynamically-generated metadata documents from user-given inputs even in non-development use cases which can undermine the mechanisms herein.\r\n\r\ne.g. `client_id: https://someurl.com?scope=scope1%20scope2` is allowed, but should be strongly discouraged outside of local development contexts.\r\n\r\nThis discouragement could fit well in the additional **Security Considerations** I am thinking. Something along the lines \"Authorization servers SHOULD reject the use of query params to dynamically generate metadata outside of development contexts where other methods of generating metadata documents are not practical.\" \r\n\r\nWording probably needs work :P Also reinforces some good ideas I've seen around setting up a service for development metadata documents like in #12 ",
       "createdAt": "2024-11-04T20:07:13Z",
-      "updatedAt": "2025-01-10T22:01:25Z",
+      "updatedAt": "2025-03-30T14:50:01Z",
       "closedAt": null,
       "comments": [
         {
@@ -726,6 +733,13 @@
           "body": "I think you're right. Considering them separate things makes a lot of sense.",
           "createdAt": "2025-01-10T22:01:23Z",
           "updatedAt": "2025-01-10T22:01:23Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think this can be closed as complete based on the changes in #24.",
+          "createdAt": "2025-03-30T14:50:00Z",
+          "updatedAt": "2025-03-30T14:50:00Z"
         }
       ]
     },
@@ -838,7 +852,7 @@
       "labels": [],
       "body": "I recently saw a developer thinking that their Client Metadata Document needed to be served with the following CORS headers:\r\n\r\n```\r\n// Add CORS headers to allow Bluesky to fetch our metadata\r\n\"Access-Control-Allow-Origin\": \"*\",\r\n\"Access-Control-Allow-Methods\": \"GET, OPTIONS\",\r\n```\r\n\r\nThis shouldn't be necessary unless Bluesky is making requests directly to the client metadata document client-side, though, we'd probably always encourage proxied access (i.e., retrieving the documents' values from the authorization server, not requesting to 3rd-party URLs)",
       "createdAt": "2025-01-10T16:35:56Z",
-      "updatedAt": "2025-01-14T16:02:17Z",
+      "updatedAt": "2025-03-30T14:56:14Z",
       "closedAt": null,
       "comments": [
         {
@@ -854,6 +868,13 @@
           "body": "I'm not sure, there isn't any reason I can think of that a page in the browser would need to GET the client metadata document, unless someone was doing something unsafe on the authorization server side.",
           "createdAt": "2025-01-14T16:02:15Z",
           "updatedAt": "2025-01-14T16:02:15Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'm not sure if we need language in the specification to prohibit the usage of CORS headers on document URLs served or not? CORS has no bearing on the functionality of the Authorization Server being able to request the document.",
+          "createdAt": "2025-03-30T14:56:13Z",
+          "updatedAt": "2025-03-30T14:56:13Z"
         }
       ]
     },
@@ -869,7 +890,7 @@
       "labels": [],
       "body": "This issue was initially reported by @DavidBuchanan314 in https://github.com/bluesky-social/atproto/issues/3396.\n\nIn a federated network, in which hosts are known (as are PDS in the atproto network), the fact that OAuth Server will try to `GET` the client metadata can be used to faking traffic from a bunch of fake IPs, simply by forging authorization requests using the `client_id` as parameter.\n\nFor example, by forging the following requests:\n\n- `https://<pds_1>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_2>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_3>/oauth/authorize?client_id=https://example.com/page_1&...`\n\nThe website at `https://example.com/page_1` will see `GET` traffic from the IPs of all those hosts.\n\nPossible mitigations:\n- Retrieve the metadata document *after* the user authorized the request (though that could lead to weird UX & DX)\n- Add strong constraint on the URI format (eg. `.well-known`, \"must end with `.json`\", other...)\n- ~Recommend OAuth servers to remember the origins of previously failed metadata document retrieval, and prevent more call to be made on these origins~ (redacted: could be abused to cause DoS on legitimate services)\n- Other",
       "createdAt": "2025-01-20T09:23:25Z",
-      "updatedAt": "2025-01-20T13:32:26Z",
+      "updatedAt": "2025-03-30T14:48:15Z",
       "closedAt": null,
       "comments": [
         {
@@ -934,6 +955,13 @@
           "body": "Banning by origin doesn't make much sense to me, as a single host _could_ have multiple client metadata documents served by it. \n\nTake for example the Development use case, if I send the request as `client_id=https://clients.atproto.dev/123` but my `client_id` generated was actually `https://clients.atproto.dev/456`, because 123 failed, you'd end up banning all of `clients.atproto.dev` even though it does actually have valid clients.",
           "createdAt": "2025-01-20T13:20:07Z",
           "updatedAt": "2025-01-20T13:20:24Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'm not really sure what sort of mitigations we could actually enforce here. I think perhaps requiring an extension like `.json` may be a good idea.",
+          "createdAt": "2025-03-30T14:48:14Z",
+          "updatedAt": "2025-03-30T14:48:14Z"
         }
       ]
     },
@@ -967,6 +995,22 @@
           "updatedAt": "2025-03-17T12:53:47Z"
         }
       ]
+    },
+    {
+      "number": 32,
+      "id": "I_kwDOL_Xevs6wXP6t",
+      "title": "Rolling changes to client_id",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/32",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "From time to time I come across people using unstable URLs for semi-production ready apps, for instance, this one from SafeSkies (a bluesky moderation app) \u2014 whilst they have the domain `https://safeskies.app/` which is where you're redirected to, it seems the `client_id` that they use has become an internal heroku URL that backs that domain.\n\n```\nprod-safe-skies-api-231a3f5f5b17.herokuapp.com/oauth/client-metadata.json\n```\n\nWe should probably figure out some way for that client_id to signal \"hey, I'm actually `https://safeskies.app/oauth/client-metadata.json` \u2014 perhaps through redirect handling or signing or something?",
+      "createdAt": "2025-03-30T13:43:13Z",
+      "updatedAt": "2025-03-30T13:43:13Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -1465,7 +1509,7 @@
       "labels": [],
       "body": "This is as was discussed in https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/23#issuecomment-2583274006\r\n\r\nI did also add the restriction that the client metadata document response must be with a HTTP 200 OK status code, i.e., 3xx or 201 or other status codes should not be considered valid.\r\n\r\nAlso moved the development purposes section up from Security Considerations to the main part of the document.",
       "createdAt": "2025-01-10T20:15:10Z",
-      "updatedAt": "2025-01-10T20:16:03Z",
+      "updatedAt": "2025-03-30T13:45:55Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "d69da84351a89d8db86ee5c72703a10bd11d5965",
@@ -1476,7 +1520,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@aaronpk did you have a chance to look at this?",
+          "createdAt": "2025-03-30T13:45:54Z",
+          "updatedAt": "2025-03-30T13:45:54Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOL_Xevs6XnXwG",
@@ -1499,6 +1551,66 @@
           ]
         }
       ]
+    },
+    {
+      "number": 33,
+      "id": "PR_kwDOL_Xevs6Qsf7Z",
+      "title": "Rework for Client ID Prefix draft compatibility",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/33",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "See: https://drafts.aaronpk.com/oauth-client-id-prefix/draft-parecki-oauth-client-id-prefix.html\r\n\r\nThis also addresses the concerns in:\r\n- #18 and #19\r\n- Some changes related to #3 ",
+      "createdAt": "2025-03-30T14:34:21Z",
+      "updatedAt": "2025-03-30T14:48:18Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "feat/rework-for-client-id-prefix",
+      "headRefOid": "52cffccc4aaa243484338a196076ade9a8febd8a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@aaronpk you'll probably want to look at the rendered version of this when comparing.",
+          "createdAt": "2025-03-30T14:39:36Z",
+          "updatedAt": "2025-03-30T14:39:36Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 34,
+      "id": "PR_kwDOL_Xevs6QsgJB",
+      "title": "Chore: update dependencies",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/34",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I noticed the tools were out of date whilst working on #33 ",
+      "createdAt": "2025-03-30T14:36:39Z",
+      "updatedAt": "2025-03-30T14:36:39Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "chore/update-dependencies",
+      "headRefOid": "6be825a07f457f5594ae3d4046b00839d39c7d09",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
