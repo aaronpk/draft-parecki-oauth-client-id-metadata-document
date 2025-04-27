@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-01T00:42:45.696573+00:00",
+  "timestamp": "2025-04-27T00:41:26.041536+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -246,7 +246,7 @@
       "labels": [],
       "body": "The `client_uri` value is meant to point to a web page about the client. The `client_id` is the JSON metadata. So it would be reasonable for someone to implement this with values such as:\r\n\r\n```json\r\n{\r\n  \"client_id\": \"https://example.com/metadata.json\",\r\n  \"client_uri\": \"https://example.com/\"\r\n}\r\n```\r\n\r\nRequiring that the `client_uri` is a prefix means we can recommend displaying that whole value to the user, rather than only the hostname (more risky in shared domain situations) or the full `client_id` (more noisy with the potential for long strings that might scare the user)",
       "createdAt": "2024-06-13T20:19:06Z",
-      "updatedAt": "2024-07-05T20:02:22Z",
+      "updatedAt": "2025-04-26T15:32:26Z",
       "closedAt": null,
       "comments": [
         {
@@ -283,6 +283,13 @@
           "body": "Since the user comes from the client origin (can be checked through the `referer` header), and will navigate back to that same origin (redirect uri, tos, policy, etc), the oauth provider does not put the user in a position of risk, even if it does not scan the various uris against potential attacks, by simply enforcing a same origin policy on all the uris. Enforcing a same prefix policy allows to better yet protect users against different clients that would be hosted on some shared CDN (think Google buckets).\n\n\nIn our implementation, we do enforce a same prefix policy for that reason.\n\nIn the case of \"loopback clients\" (clients that do not host their own metadata document, we might need to come up with a name for those), we do not allow, or show, *any* uri, logo or name (besides `127.0.0.1` redirect uris). Even with clients that do expose their own metadata document, we keep an allowlist to determine if the logo can be shown.\n\nI strongly believe that:\n- the spec should require (MUST) that the various uris be on the same origin.\n- the spec should suggest (SHOULD) that the various uris be on the same prefix\n- the spec should require (MUST) not to display the logo without manual approval\n- the spec should suggest (SHOULD) display a warning in case of non allow listed clients (\"This client pretends to be X, but make sure that the <client_origin> is indeed owned by X before you continue\")\n- the spec should suggest (SHOULD) to add additional security measures for non allow listed clients (no SSO, refresh tokens limited to short period, etc)\n- any \"metadata document as a service\" should not allow using arbitrary/unverified origins in client uris. In particular it should not (MUST NOT) bypass the same origin policy by redirecting the user to an arbitrary uri (this should be more easy to enforce by the auth server than performing a malware scan)\n- \"loopback clients\" (client uri using `http://localhost`, or any other non HTTPS uri) offer a great way for authorization servers to detect clients marking themselves as potentially vulnerable to attacks (e.g. two apps running on the same computer, the second trying to impersonate the first by using the same metadata document)\n- \"loopback clients\" also allow each auth server to provide their own default in the metadata document (though this might be problematic for interoperability)\n\n\nFor all these reasons, I think that a same prefix policy, and an indentifiable \"loopback client\" uri scheme should really be specced.",
           "createdAt": "2024-07-05T20:02:21Z",
           "updatedAt": "2024-07-05T20:02:21Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Okay, as [mentioned on bsky](https://bsky.app/profile/thisismissem.bsky.social/post/3lnq2grfqys2t), by requiring the Client ID Metadata Document be on the same origin as the `redirect_uris` you end up with people needing to employ a lot of nasty insecure hacks in order to redirect back to applications not on the public internet (e.g., those on intranet, internal development networks, etc).\n\nBy not having the same-origin the constrain on the `redirect_uri`, we enable people to host their Client ID Metadata Document on the public internet, whilst their application lives in a protected network.\n\nUsing same-origin policies for logo_uri, tos_uri, etc may make sense, but even then, they should be constrained to `client_uri` not `client_id`",
+          "createdAt": "2025-04-26T15:32:25Z",
+          "updatedAt": "2025-04-26T15:32:25Z"
         }
       ]
     },
