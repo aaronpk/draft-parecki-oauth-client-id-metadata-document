@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-27T00:41:26.041536+00:00",
+  "timestamp": "2025-04-29T00:38:39.566638+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -246,7 +246,7 @@
       "labels": [],
       "body": "The `client_uri` value is meant to point to a web page about the client. The `client_id` is the JSON metadata. So it would be reasonable for someone to implement this with values such as:\r\n\r\n```json\r\n{\r\n  \"client_id\": \"https://example.com/metadata.json\",\r\n  \"client_uri\": \"https://example.com/\"\r\n}\r\n```\r\n\r\nRequiring that the `client_uri` is a prefix means we can recommend displaying that whole value to the user, rather than only the hostname (more risky in shared domain situations) or the full `client_id` (more noisy with the potential for long strings that might scare the user)",
       "createdAt": "2024-06-13T20:19:06Z",
-      "updatedAt": "2025-04-26T15:32:26Z",
+      "updatedAt": "2025-04-28T18:37:42Z",
       "closedAt": null,
       "comments": [
         {
@@ -290,6 +290,13 @@
           "body": "Okay, as [mentioned on bsky](https://bsky.app/profile/thisismissem.bsky.social/post/3lnq2grfqys2t), by requiring the Client ID Metadata Document be on the same origin as the `redirect_uris` you end up with people needing to employ a lot of nasty insecure hacks in order to redirect back to applications not on the public internet (e.g., those on intranet, internal development networks, etc).\n\nBy not having the same-origin the constrain on the `redirect_uri`, we enable people to host their Client ID Metadata Document on the public internet, whilst their application lives in a protected network.\n\nUsing same-origin policies for logo_uri, tos_uri, etc may make sense, but even then, they should be constrained to `client_uri` not `client_id`",
           "createdAt": "2025-04-26T15:32:25Z",
           "updatedAt": "2025-04-26T15:32:25Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Actually, in the case of frontpage in particular, the whole client metadata document is behind a protected HTTP route. Relaxing restrictions on the `redirect_uris`' origin makes the \"hack\" slightly simpler by not requiring to redirect the user to some intermediary endpoint. But I think that qualifying this hack as being \"nasty insecure\" is a bit strong. It is, after all, a simple redirect from the client to itself.",
+          "createdAt": "2025-04-28T18:37:41Z",
+          "updatedAt": "2025-04-28T18:37:41Z"
         }
       ]
     },
