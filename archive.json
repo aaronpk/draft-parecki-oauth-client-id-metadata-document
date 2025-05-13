@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-04-29T00:38:39.566638+00:00",
+  "timestamp": "2025-05-13T00:39:40.932211+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -1523,7 +1523,7 @@
       "labels": [],
       "body": "This is as was discussed in https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/23#issuecomment-2583274006\r\n\r\nI did also add the restriction that the client metadata document response must be with a HTTP 200 OK status code, i.e., 3xx or 201 or other status codes should not be considered valid.\r\n\r\nAlso moved the development purposes section up from Security Considerations to the main part of the document.",
       "createdAt": "2025-01-10T20:15:10Z",
-      "updatedAt": "2025-03-30T13:45:55Z",
+      "updatedAt": "2025-05-11T20:40:28Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "d69da84351a89d8db86ee5c72703a10bd11d5965",
@@ -1541,6 +1541,13 @@
           "body": "@aaronpk did you have a chance to look at this?",
           "createdAt": "2025-03-30T13:45:54Z",
           "updatedAt": "2025-03-30T13:45:54Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Some of this is superseded by #35 ",
+          "createdAt": "2025-05-11T20:40:27Z",
+          "updatedAt": "2025-05-11T20:40:27Z"
         }
       ],
       "reviews": [
@@ -1619,6 +1626,32 @@
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "chore/update-dependencies",
       "headRefOid": "6be825a07f457f5594ae3d4046b00839d39c7d09",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 35,
+      "id": "PR_kwDOL_Xevs6VvsMW",
+      "title": "Improve development clients section, enabling developers",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/35",
+      "state": "OPEN",
+      "author": "ThisIsMissEm",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@aaronpk I think this more accurately addresses the safety concerns of @matthieusieben in #10, whilst avoiding the many troubles that developers have been facing trying to work with Client ID Metadata Documents within AT Proto / Bluesky, where they often struggle to do things like:\r\n- develop from their local machine without exposing it to the public internet\r\n- run deployments of their application in private or protected environments (such as PR preview environments or staging environments)\r\n\r\nA Client ID Metadata Document Service would also remove the need for AT Proto's localhost `client_id` system which isn't actually part of this specification: https://atproto.com/specs/oauth#localhost-client-development\r\n\r\n",
+      "createdAt": "2025-05-11T20:30:02Z",
+      "updatedAt": "2025-05-11T20:30:02Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
+      "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "feat/development-clients",
+      "headRefOid": "20dfee75267667799c333e9e1daea0eef8d686f6",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
