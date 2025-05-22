@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-13T00:39:40.932211+00:00",
+  "timestamp": "2025-05-22T00:39:27.740479+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -1585,7 +1585,7 @@
       "labels": [],
       "body": "See: https://drafts.aaronpk.com/oauth-client-id-prefix/draft-parecki-oauth-client-id-prefix.html\r\n\r\nThis also addresses the concerns in:\r\n- #18 and #19\r\n- Some changes related to #3 ",
       "createdAt": "2025-03-30T14:34:21Z",
-      "updatedAt": "2025-03-30T14:48:18Z",
+      "updatedAt": "2025-05-20T12:24:45Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
@@ -1605,7 +1605,28 @@
           "updatedAt": "2025-03-30T14:39:36Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOL_Xevs6qHBSA",
+          "commit": {
+            "abbreviatedOid": "52cffcc"
+          },
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-05-20T12:24:44Z",
+          "updatedAt": "2025-05-20T12:24:45Z",
+          "comments": [
+            {
+              "originalPosition": 87,
+              "body": "From an implementation standpoint, it is quite convenient to allow `data:` URLs.\r\n\r\nIndeed, this allows the AS to serve UI without the need to proxy client defined assets (logo, privacy policy, ToS, etc.).\r\n\r\nI mean it's fine if you want to leave `data:` as not recommended, but I would not put it in the same basket as `javascript:` that should probably be out right forbidden.\r\n\r\n",
+              "createdAt": "2025-05-20T12:24:45Z",
+              "updatedAt": "2025-05-20T12:24:45Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 34,
