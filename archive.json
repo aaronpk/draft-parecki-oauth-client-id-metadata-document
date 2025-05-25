@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-22T00:39:27.740479+00:00",
+  "timestamp": "2025-05-25T00:44:12.034294+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -904,7 +904,7 @@
       "labels": [],
       "body": "This issue was initially reported by @DavidBuchanan314 in https://github.com/bluesky-social/atproto/issues/3396.\n\nIn a federated network, in which hosts are known (as are PDS in the atproto network), the fact that OAuth Server will try to `GET` the client metadata can be used to faking traffic from a bunch of fake IPs, simply by forging authorization requests using the `client_id` as parameter.\n\nFor example, by forging the following requests:\n\n- `https://<pds_1>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_2>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_3>/oauth/authorize?client_id=https://example.com/page_1&...`\n\nThe website at `https://example.com/page_1` will see `GET` traffic from the IPs of all those hosts.\n\nPossible mitigations:\n- Retrieve the metadata document *after* the user authorized the request (though that could lead to weird UX & DX)\n- Add strong constraint on the URI format (eg. `.well-known`, \"must end with `.json`\", other...)\n- ~Recommend OAuth servers to remember the origins of previously failed metadata document retrieval, and prevent more call to be made on these origins~ (redacted: could be abused to cause DoS on legitimate services)\n- Other",
       "createdAt": "2025-01-20T09:23:25Z",
-      "updatedAt": "2025-03-30T14:48:15Z",
+      "updatedAt": "2025-05-22T12:27:55Z",
       "closedAt": null,
       "comments": [
         {
@@ -976,6 +976,27 @@
           "body": "I'm not really sure what sort of mitigations we could actually enforce here. I think perhaps requiring an extension like `.json` may be a good idea.",
           "createdAt": "2025-03-30T14:48:14Z",
           "updatedAt": "2025-03-30T14:48:14Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "> I think perhaps requiring an extension like .json may be a good idea.\n\nThis would provide a good mitigation!",
+          "createdAt": "2025-05-22T11:45:52Z",
+          "updatedAt": "2025-05-22T11:45:52Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "Also, we could require that the AS set some headers:\n\n- `Accept: application/json`: If the server properly implements content negotiation, this should cause a 406\n- Add some keyword in the `User-Agent` (e.g. `oauth-authorization-server`)",
+          "createdAt": "2025-05-22T11:49:51Z",
+          "updatedAt": "2025-05-22T11:52:25Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "The file extension in a URL really doesn't matter: it's the content-type that is served. You could certainly send already an `Accept: application/json` header, but it's also acceptable that the document be returned with `application/ld+json` or anything similar.\n\nFrom the I-D already:\n> The client metadata document MAY also be served with more specific content types as long as the response is JSON and conforms to `application/<AS-defined>+json`",
+          "createdAt": "2025-05-22T12:27:54Z",
+          "updatedAt": "2025-05-22T12:27:54Z"
         }
       ]
     },
