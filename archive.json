@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-25T00:44:12.034294+00:00",
+  "timestamp": "2025-06-01T00:51:18.334870+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -62,9 +62,17 @@
       "labels": [],
       "body": "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-metadata-caching\r\n\r\nProbably makes sense to respect the HTTP cache headers from the metadata URL.\r\n\r\nThe AS should probably also have its own min/max cache lifetime policy. Not sure if we want to recommend something explicit here though since it might depend on the particular deployment.",
       "createdAt": "2024-05-31T13:56:13Z",
-      "updatedAt": "2024-05-31T13:56:13Z",
+      "updatedAt": "2025-05-29T20:12:52Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "sdesen",
+          "authorAssociation": "NONE",
+          "body": "Could see a possibility similar to domain takeover where a previously published url is in a cached version which has been taken over. Unless domain restrictions apply on all URLs. The section about XSRF covers this but maybe that section should be mentioned in the caching section for example.",
+          "createdAt": "2025-05-29T20:12:51Z",
+          "updatedAt": "2025-05-29T20:12:51Z"
+        }
+      ]
     },
     {
       "number": 4,
@@ -312,9 +320,24 @@
       "labels": [],
       "body": "For a client that has a registered JWKS, what should the AS do (if anything), when it notices the keys changed? Keys could change for multiple reasons:\r\n\r\n* The client is proactively rotating its keys\r\n* A client key was compromised\r\n",
       "createdAt": "2024-06-13T20:22:14Z",
-      "updatedAt": "2024-06-13T20:22:14Z",
+      "updatedAt": "2025-05-31T09:06:41Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "sdesen",
+          "authorAssociation": "NONE",
+          "body": "Use same methodology as jwks uri where multiple keys are supported?",
+          "createdAt": "2025-05-29T20:10:23Z",
+          "updatedAt": "2025-05-29T20:10:23Z"
+        },
+        {
+          "author": "matthieusieben",
+          "authorAssociation": "NONE",
+          "body": "In Bluesky's deployment, each oauth session is bound to a specific confidential client key (using kid/jkt).\n\nThis mechanism allows clients to revoke sessions at scale as they must both be able to prove ownership of the key, and ensure its presence in the jwks.\n\nIf short access token lifetimes are used (as is generally recommend), this essentially allows the AS not to have to proactively revoke existing access token.\n\nHowever, in systems that use longer access token lifetimes, it might be worth recommending that AS proactively revoke access token whose session is bound to keys that were removed from jwks",
+          "createdAt": "2025-05-31T09:06:39Z",
+          "updatedAt": "2025-05-31T09:06:39Z"
+        }
+      ]
     },
     {
       "number": 12,
@@ -1044,6 +1067,22 @@
       "body": "From time to time I come across people using unstable URLs for semi-production ready apps, for instance, this one from SafeSkies (a bluesky moderation app) \u2014 whilst they have the domain `https://safeskies.app/` which is where you're redirected to, it seems the `client_id` that they use has become an internal heroku URL that backs that domain.\n\n```\nprod-safe-skies-api-231a3f5f5b17.herokuapp.com/oauth/client-metadata.json\n```\n\nWe should probably figure out some way for that client_id to signal \"hey, I'm actually `https://safeskies.app/oauth/client-metadata.json` \u2014 perhaps through redirect handling or signing or something?",
       "createdAt": "2025-03-30T13:43:13Z",
       "updatedAt": "2025-03-30T13:43:13Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 36,
+      "id": "I_kwDOL_Xevs6420VC",
+      "title": "specify native app restriction for clarity on client authentication section",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/36",
+      "state": "OPEN",
+      "author": "sdesen",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "> This establishes this client as a confidential client, \n\nMight be worth nothing this is only possible for clients that support credentials in the first place?",
+      "createdAt": "2025-05-29T20:11:27Z",
+      "updatedAt": "2025-05-29T20:11:27Z",
       "closedAt": null,
       "comments": []
     }
