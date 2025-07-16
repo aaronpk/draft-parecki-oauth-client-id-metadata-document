@@ -35,6 +35,8 @@ normative:
   RFC6819:
   RFC7591:
   RFC8414:
+  RFC9111:
+  RFC9110:
   I-D.draft-ietf-oauth-security-topics:
 
 informative:
@@ -157,9 +159,12 @@ of the client. The client metadata values are the values defined in
 the OAuth Dynamic Client Registration Metadata OAuth Parameters registry
 <https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata>.
 
+The client metadata document MUST be served with a 200 OK HTTP status code
+as defined in {{RFC9110}} Section 15.3.1.
+
 The client metadata document MUST contain a `client_id` property whose value
-MUST compare and match the URL of the document using simple string comparison as
-defined in [RFC3986] Section 6.2.1.
+MUST compare and match the URL of the document using simple string comparison
+as defined in {{RFC3986}} Section 6.2.1.
 
 The client metadata document MAY define additional properties in the response.
 The client metadata document MAY also be served with more specific content types
@@ -180,7 +185,35 @@ client metadata document accepted by authorization servers implementing their
 specification, for instance, preventing the registration of confidential clients
 by requiring the `token_endpoint_auth_method` property be set to `"none"`.
 
-TBD: We may want a property such as `client_id_expires_at` for indicating that the client is ephemeral and not valid after a given timestamp, especially for documents issued by a service for development purposes.
+The response for a client metadata document MAY return the `Expires` header, as
+defined in  {{RFC9111}}, to indicate to an Authorization Server that the
+client metadata document has a limited lifetime, and consequently, so does the
+OAuth Client created from the document. If the client metadata document cannot
+be re-fetched by the Authorization Server after the `Expires` time, then the
+Authorization Server MUST treat that `client_id` as being an `unauthorized_client`.
+
+### Client Metadata Documents for Development Use {#documents_for_development}
+
+When developing applications against a service that use this internet draft,
+developers often encounter the issue of “how do I serve a client metadata document
+at a `https` URL whilst developing my application?”.
+
+For this purpose, it is recommended to use a service that generates and hosts client
+metadata documents for development purposes.
+
+A service that generates client metadata documents for development purposes SHOULD
+use short stable URLs, i.e., MUST NOT derive the contents of the document from query
+parameters, and MUST return a HTTP `Expires` header with the response.
+
+Alternatively, a developer may to upload the client metadata document to any publicly
+accessible URL with HTTPS, with the contents describing the client for local development
+(e.g., using the localhost hostname in its `redirect_uris`), if you do this, you may
+want to consider setting the HTTP Expires header to indicate expiration of your client
+to the authorization server.
+
+An authorization server MAY place additional restrictions on the contents of client
+metadata documents, such as only allowing non-public hostnames in the `redirect_uris`
+if the client metadata document is from a trusted origin.
 
 ## Metadata Discovery Errors
 
@@ -225,12 +258,6 @@ This enables clients to avoid sending the user to a dead end, by only redirectin
 # Security Considerations
 
 In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{I-D.draft-ietf-oauth-security-topics}} the additional considerations apply.
-
-## Client ID Metadata Documents for Development Purposes {#documents_for_development}
-
-When developing applications against a service that uses Client ID Metadata Documents, developers often encounter the issue of "how do I serve a Client ID Metadata Document at a https URL whilst developing my application?".
-
-For this purpose, it is recommended to either host a document on a webserver somewhere that describes the application under development (e.g., using localhost redirect URIs), or to use a service which can generate and host a Client ID Metadata Document for you. Such a service should issue URLs that are stable.
 
 ## Client Authentication {#client_authentication}
 
