@@ -184,7 +184,7 @@ TBD: We may want a property such as `client_id_expires_at` for indicating that t
 
 ## Client Metadata Documents for Development Purposes {#documents_for_development}
 
-When developing applications against an authorization server which uses this specification, developers often encounter the issue of "how do I server a Client ID Metadata Document at a publicly accessible https URL whilst developing my application on my localhost?".
+When developing applications against an authorization server which uses this specification, developers often encounter the issue of "how do I serve a Client ID Metadata Document at a publicly accessible https URL whilst developing my application on my localhost?".
 
 To enable developers to author applications on their machines, without exposing their machines to the public internet, the usage of Client ID Metadata Document Services by the authorization server is RECOMMENDED.
 
