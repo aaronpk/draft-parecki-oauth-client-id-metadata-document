@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-06-01T00:51:18.334870+00:00",
+  "timestamp": "2025-07-17T00:43:26.188464+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -927,7 +927,7 @@
       "labels": [],
       "body": "This issue was initially reported by @DavidBuchanan314 in https://github.com/bluesky-social/atproto/issues/3396.\n\nIn a federated network, in which hosts are known (as are PDS in the atproto network), the fact that OAuth Server will try to `GET` the client metadata can be used to faking traffic from a bunch of fake IPs, simply by forging authorization requests using the `client_id` as parameter.\n\nFor example, by forging the following requests:\n\n- `https://<pds_1>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_2>/oauth/authorize?client_id=https://example.com/page_1&...`\n- `https://<pds_3>/oauth/authorize?client_id=https://example.com/page_1&...`\n\nThe website at `https://example.com/page_1` will see `GET` traffic from the IPs of all those hosts.\n\nPossible mitigations:\n- Retrieve the metadata document *after* the user authorized the request (though that could lead to weird UX & DX)\n- Add strong constraint on the URI format (eg. `.well-known`, \"must end with `.json`\", other...)\n- ~Recommend OAuth servers to remember the origins of previously failed metadata document retrieval, and prevent more call to be made on these origins~ (redacted: could be abused to cause DoS on legitimate services)\n- Other",
       "createdAt": "2025-01-20T09:23:25Z",
-      "updatedAt": "2025-05-22T12:27:55Z",
+      "updatedAt": "2025-07-16T23:09:45Z",
       "closedAt": null,
       "comments": [
         {
@@ -1020,6 +1020,13 @@
           "body": "The file extension in a URL really doesn't matter: it's the content-type that is served. You could certainly send already an `Accept: application/json` header, but it's also acceptable that the document be returned with `application/ld+json` or anything similar.\n\nFrom the I-D already:\n> The client metadata document MAY also be served with more specific content types as long as the response is JSON and conforms to `application/<AS-defined>+json`",
           "createdAt": "2025-05-22T12:27:54Z",
           "updatedAt": "2025-05-22T12:27:54Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "I'd like to land on some concrete recommendations here. So far, I'm seeing these as the most promising:\n\n### Accept Header\nThe AS MUST add an `Accept` header when fetching the client metadata, since that is likely to allow unrelated servers to more quickly reject the request.\n\nAn `Accept` header of `application/json` should allow the server to respond with `application/foo+json` as well if I remember my HTTP correctly.\n\n### Authenticate the user first\n\nThe recommendation to hold off on fetching the client metadata until the user is authenticated seems to prevent the main concern of an unauthenticated request with an arbitrary `client_id` URL causing the server to make a request. It at least significantly reduces the scenarios where the threat is possible.\n\n\n",
+          "createdAt": "2025-07-16T23:09:45Z",
+          "updatedAt": "2025-07-16T23:09:45Z"
         }
       ]
     },
@@ -1693,24 +1700,26 @@
       "id": "PR_kwDOL_Xevs6QsgJB",
       "title": "Chore: update dependencies",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/34",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I noticed the tools were out of date whilst working on #33 ",
       "createdAt": "2025-03-30T14:36:39Z",
-      "updatedAt": "2025-03-30T14:36:39Z",
+      "updatedAt": "2025-07-16T22:39:48Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "chore/update-dependencies",
       "headRefOid": "6be825a07f457f5594ae3d4046b00839d39c7d09",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-07-16T22:39:47Z",
+      "mergedAt": "2025-07-16T22:39:47Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "8764ee56d59a67216c7fd4b8a0326487fc402bbb"
+      },
       "comments": [],
       "reviews": []
     },
@@ -1726,19 +1735,100 @@
       "labels": [],
       "body": "@aaronpk I think this more accurately addresses the safety concerns of @matthieusieben in #10, whilst avoiding the many troubles that developers have been facing trying to work with Client ID Metadata Documents within AT Proto / Bluesky, where they often struggle to do things like:\r\n- develop from their local machine without exposing it to the public internet\r\n- run deployments of their application in private or protected environments (such as PR preview environments or staging environments)\r\n\r\nA Client ID Metadata Document Service would also remove the need for AT Proto's localhost `client_id` system which isn't actually part of this specification: https://atproto.com/specs/oauth#localhost-client-development\r\n\r\n",
       "createdAt": "2025-05-11T20:30:02Z",
-      "updatedAt": "2025-05-11T20:30:02Z",
+      "updatedAt": "2025-07-16T23:33:23Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "feat/development-clients",
-      "headRefOid": "20dfee75267667799c333e9e1daea0eef8d686f6",
+      "headRefOid": "8f5c83cafa86ad699801f114a8c5da33bfdc0fe1",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOL_Xevs60biQA",
+          "commit": {
+            "abbreviatedOid": "20dfee7"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-16T22:43:01Z",
+          "updatedAt": "2025-07-16T22:43:01Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "```suggestion\r\nWhen developing applications against an authorization server which uses this specification, developers often encounter the issue of \"how do I serve a Client ID Metadata Document at a publicly accessible https URL whilst developing my application on my localhost?\".\r\n```",
+              "createdAt": "2025-07-16T22:43:01Z",
+              "updatedAt": "2025-07-16T22:43:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs60bk9t",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-16T22:45:50Z",
+          "updatedAt": "2025-07-16T22:45:50Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "I'm not sure I follow this sentence. I think I'm getting confused about \"at least one Client ID Metadata Document Service\", what is \"service\" here? I thought the concept of the AS hosting metadata for in-development clients was the service.",
+              "createdAt": "2025-07-16T22:45:50Z",
+              "updatedAt": "2025-07-16T22:45:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs60byJl",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-16T23:11:45Z",
+          "updatedAt": "2025-07-16T23:11:45Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "It is a bit awkward to phrase correctly. Essentially what I'm trying to say is \"if you want to restrict redirect_uri's, then have a service where developers can register/request a Client ID Metadata Document for use in non-production use cases\", essentially a trusted static registry which serves multiple Client ID Metadata Documents from the one domain.",
+              "createdAt": "2025-07-16T23:11:45Z",
+              "updatedAt": "2025-07-16T23:11:45Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs60cAlj",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-16T23:33:23Z",
+          "updatedAt": "2025-07-16T23:33:23Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "oh I get it now. I was reading that as restricting redirect URLs in the context of dev clients. I think that would make more sense in the very beginning of this section to set the context for why this metadata hosting service is needed.",
+              "createdAt": "2025-07-16T23:33:23Z",
+              "updatedAt": "2025-07-16T23:33:23Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
