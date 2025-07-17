@@ -169,8 +169,9 @@ As there is no way to establish a shared secret to be used with client metadata
 documents, the following restrictions apply on the contents of the
 client metadata document:
 
-* the `token_endpoint_auth_method` property MUST NOT include `client_secret_post`
-or `client_secret_basic`
+* the `token_endpoint_auth_method` property MUST NOT include `client_secret_post`,
+`client_secret_basic`, `client_secret_jwt`, or any other method based around
+a shared symmetric secret.
 * the `client_secret` and `client_secret_expires_at` properties MUST NOT be used
 
 See {{client_authentication}} for more details.
@@ -297,7 +298,7 @@ The following authorization server metadata value is defined by this specificati
 
 The idea of using URIs as the `client_id` in OAuth based authorization requests is not new, and has previously been specified in varying ways by [IndieAuth], [Solid-OIDC], and [OpenID.Federation]. This specification is largely inspired by the work of Aaron Coburn, elf Pavlik, and Dmitri Zagidulin in their [Solid-OIDC] specification which defined dereferenceable Client Identifier Documents.
 
-The authors would like to thank the following people for their contributions and reviews of this specification: Dick Hardt, Matthieu Sieben.
+The authors would like to thank the following people for their contributions and reviews of this specification: Dick Hardt, Matthieu Sieben, Filip Skokan.
 
 
 # Document History
