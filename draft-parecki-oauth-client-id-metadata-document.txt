@@ -5,7 +5,7 @@
 Web Authorization Protocol                                    A. Parecki
 Internet-Draft                                                      Okta
 Intended status: Standards Track                                E. Smith
-Expires: 17 January 2026                                    16 July 2025
+Expires: 18 January 2026                                    17 July 2025
 
 
                    OAuth Client ID Metadata Document
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 January 2026.
+   This Internet-Draft will expire on 18 January 2026.
 
 Copyright Notice
 
@@ -177,7 +177,8 @@ Table of Contents
    contents of the client metadata document:
 
    *  the token_endpoint_auth_method property MUST NOT include
-      client_secret_post or client_secret_basic
+      client_secret_post, client_secret_basic, client_secret_jwt, or any
+      other method based around a shared symmetric secret.
 
    *  the client_secret and client_secret_expires_at properties MUST NOT
       be used
@@ -438,7 +439,7 @@ Acknowledgments
 
    The authors would like to thank the following people for their
    contributions and reviews of this specification: Dick Hardt, Matthieu
-   Sieben.
+   Sieben, Filip Skokan.
 
 Document History
 
