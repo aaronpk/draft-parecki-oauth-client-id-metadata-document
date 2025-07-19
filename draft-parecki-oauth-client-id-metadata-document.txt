@@ -5,7 +5,7 @@
 Web Authorization Protocol                                    A. Parecki
 Internet-Draft                                                      Okta
 Intended status: Standards Track                                E. Smith
-Expires: 18 January 2026                                    17 July 2025
+Expires: 20 January 2026                                    19 July 2025
 
 
                    OAuth Client ID Metadata Document
@@ -26,7 +26,7 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://aaronpk.github.io/draft-parecki-oauth-client-id-metadata-
+   https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-
    document/draft-parecki-oauth-client-id-metadata-document.html.
    Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-parecki-oauth-client-id-
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 January 2026.
+   This Internet-Draft will expire on 20 January 2026.
 
 Copyright Notice
 
@@ -164,8 +164,8 @@ Table of Contents
    parameters.xhtml#client-metadata).
 
    The client metadata document MUST contain a client_id property whose
-   value MUST compare and match the URL of the document using simple
-   string comparison as defined in [RFC3986] Section 6.2.1.
+   value MUST match the URL of the document using simple string
+   comparison as defined in [RFC3986] Section 6.2.1.
 
    The client metadata document MAY define additional properties in the
    response.  The client metadata document MAY also be served with more
@@ -218,10 +218,9 @@ Table of Contents
 
 4.4.  Redirect URL Registration
 
-   According to [I-D.draft-ietf-oauth-security-topics], the
-   authorization server MUST require registration of redirect URIs, and
-   MUST ensure that the redirect URI in a request is an exact match of a
-   registered redirect URI.
+   According to [RFC9700], the authorization server MUST require
+   registration of redirect URIs, and MUST ensure that the redirect URI
+   in a request is an exact match of a registered redirect URI.
 
    This method of client information discovery establishes a registered
    redirect URI with the authorization server which is used when
@@ -249,8 +248,7 @@ Table of Contents
 
    In addition to the security considerations in OAuth 2.0 Core
    [RFC6749], and OAuth 2.0 Threat Model and Security Considerations
-   [RFC6819], and [I-D.draft-ietf-oauth-security-topics] the additional
-   considerations apply.
+   [RFC6819], and [RFC9700] the additional considerations apply.
 
 6.1.  Client ID Metadata Documents for Development Purposes
 
@@ -288,6 +286,11 @@ Table of Contents
    This establishes this client as a confidential client, and any
    communication with the authorization server MUST include client
    authentication of the registered type.
+
+   The particular method of associating the private key with the client
+   is out of scope of this specification, but may include methods such
+   as Attestation Based Client Authentication
+   [I-D.draft-ietf-oauth-attestation-based-client-auth].
 
 6.3.  OAuth Phishing Attacks
 
@@ -365,14 +368,6 @@ Table of Contents
 
 8.1.  Normative References
 
-   [I-D.draft-ietf-oauth-security-topics]
-              Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
-              "OAuth 2.0 Security Best Current Practice", Work in
-              Progress, Internet-Draft, draft-ietf-oauth-security-
-              topics-29, 3 June 2024,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
-              security-topics-29>.
-
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -406,7 +401,20 @@ Table of Contents
               DOI 10.17487/RFC8414, June 2018,
               <https://www.rfc-editor.org/rfc/rfc8414>.
 
+   [RFC9700]  Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett,
+              "Best Current Practice for OAuth 2.0 Security", BCP 240,
+              RFC 9700, DOI 10.17487/RFC9700, January 2025,
+              <https://www.rfc-editor.org/rfc/rfc9700>.
+
 8.2.  Informative References
+
+   [I-D.draft-ietf-oauth-attestation-based-client-auth]
+              Looker, T., Bastian, P., and C. Bormann, "OAuth 2.0
+              Attestation-Based Client Authentication", Work in
+              Progress, Internet-Draft, draft-ietf-oauth-attestation-
+              based-client-auth-06, 7 July 2025,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-
+              attestation-based-client-auth-06>.
 
    [IndieAuth]
               Parecki, A., "IndieAuth", 12 February 2022,
@@ -445,6 +453,13 @@ Document History
 
    (This appendix to be deleted by the RFC editor in the final
    specification.)
+
+   -03
+
+   *  Prohibit all forms of symmetric client authentication, not just
+      client secret
+
+   *  Updated references
 
    -02
 
