@@ -18,7 +18,7 @@ venue:
   type: "Working Group"
   mail: "oauth@ietf.org"
   github: "aaronpk/draft-parecki-oauth-client-id-metadata-document"
-  latest: "https://aaronpk.github.io/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html"
+  latest: "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html"
 
 author:
   - fullname: Aaron Parecki
@@ -35,7 +35,7 @@ normative:
   RFC6819:
   RFC7591:
   RFC8414:
-  I-D.draft-ietf-oauth-security-topics:
+  RFC9700:
 
 informative:
   IndieAuth:
@@ -87,6 +87,7 @@ informative:
         org: independent
       - name: V. Dzhuvinov
         org: Connect2id
+  I-D.draft-ietf-oauth-attestation-based-client-auth:
 
 entity:
   SELF: "[draft-parecki-oauth-client-id-metadata-document-latest]"
@@ -158,7 +159,7 @@ the OAuth Dynamic Client Registration Metadata OAuth Parameters registry
 <https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata>.
 
 The client metadata document MUST contain a `client_id` property whose value
-MUST compare and match the URL of the document using simple string comparison as
+MUST match the URL of the document using simple string comparison as
 defined in [RFC3986] Section 6.2.1.
 
 The client metadata document MAY define additional properties in the response.
@@ -204,7 +205,7 @@ is valid?
 
 ## Redirect URL Registration
 
-According to {{I-D.draft-ietf-oauth-security-topics}}, the authorization server
+According to {{RFC9700}}, the authorization server
 MUST require registration of redirect URIs, and MUST ensure that the redirect URI
 in a request is an exact match of a registered redirect URI.
 
@@ -225,7 +226,7 @@ This enables clients to avoid sending the user to a dead end, by only redirectin
 
 # Security Considerations
 
-In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{I-D.draft-ietf-oauth-security-topics}} the additional considerations apply.
+In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{RFC9700}} the additional considerations apply.
 
 ## Client ID Metadata Documents for Development Purposes {#documents_for_development}
 
@@ -252,6 +253,8 @@ to establish a public key and the `private_key_jwt` authentication method define
 
 This establishes this client as a confidential client, and any communication with
 the authorization server MUST include client authentication of the registered type.
+
+The particular method of associating the private key with the client is out of scope of this specification, but may include methods such as Attestation Based Client Authentication [I-D.draft-ietf-oauth-attestation-based-client-auth].
 
 ## OAuth Phishing Attacks
 
@@ -305,6 +308,12 @@ The authors would like to thank the following people for their contributions and
 {:numbered="false"}
 
 (This appendix to be deleted by the RFC editor in the final specification.)
+
+-03
+
+* Prohibit all forms of symmetric client authentication, not just client secret
+* Updated references
+
 
 -02
 
