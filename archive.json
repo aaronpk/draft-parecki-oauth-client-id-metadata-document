@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-17T00:43:26.188464+00:00",
+  "timestamp": "2025-07-20T00:49:24.685594+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -191,7 +191,7 @@
       "labels": [],
       "body": "We should prohibit any `client_secret_*` values in the `token_endpoint_auth_method` for client metadata. \r\n\r\nhttps://www.rfc-editor.org/rfc/rfc7591#section-2",
       "createdAt": "2024-06-13T19:49:22Z",
-      "updatedAt": "2024-07-02T21:04:33Z",
+      "updatedAt": "2025-07-19T01:09:02Z",
       "closedAt": "2024-07-02T21:04:33Z",
       "comments": [
         {
@@ -545,7 +545,7 @@
       "labels": [],
       "body": "I picked this up from @nseydoux on the Inrupt team, where the OAuth spec doesn't actually require absolute URIs for various properties like logo_uri, tos_uri, etc.\r\n\r\nRef: https://github.com/solid/solid-oidc/issues/231",
       "createdAt": "2024-07-08T17:29:45Z",
-      "updatedAt": "2024-08-04T13:58:17Z",
+      "updatedAt": "2025-07-17T15:07:35Z",
       "closedAt": null,
       "comments": [
         {
@@ -554,6 +554,20 @@
           "body": "I was trying to figure out if there was any earlier discussion about this for [RFC 8414, Authorization server Metadata](https://www.rfc-editor.org/rfc/rfc8414). But I was not able to find anything. Feels like that would have had the same issue, but it has never come up?",
           "createdAt": "2024-08-04T13:58:16Z",
           "updatedAt": "2024-08-04T13:58:16Z"
+        },
+        {
+          "author": "panva",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Despite having a name like `*_uri`, these are defined as `URL string ...`, that means having a http(s) scheme and all specifics of a URL. Is that not clearly absolute by definition already?",
+          "createdAt": "2025-07-17T14:49:36Z",
+          "updatedAt": "2025-07-17T14:49:36Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "In [RFC 6748](https://datatracker.ietf.org/doc/html/rfc6749#appendix-A.6), `redirect_uri` is defined as `URI-Reference` which is according to [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986#section-4.1), \"A URI-reference is either a URI or a relative reference.\"\n\nIn [RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591#section-2), the properties in the client metadata, they are defined as \"URL string\", however, there is no definition in that document of \"URL string\", and that document does not reference RFC 3986. Unless I'm missing something?\n\nPerhaps 7591 should be updated to reference RFC 3986, specifically using [`absolute-URI`](https://datatracker.ietf.org/doc/html/rfc3986#section-4.3) for these values?",
+          "createdAt": "2025-07-17T15:06:43Z",
+          "updatedAt": "2025-07-17T15:07:35Z"
         }
       ]
     },
@@ -651,7 +665,7 @@
       "labels": [],
       "body": "With mobile applications, unless you use application claimed https URLs and the system authentication mechanisms (I believe Apple and Google have a \"sign in with\" dialog for this now, instead of using an in-app webview), then there is potential for the `redirect_uris` to be hijacked by another application (e.g., if using a `myapp://` redirect URI scheme.\r\n\r\nI'm not sure what can be done to further mitigate this, besides DPoP and PKCE which mitigate redirect hijacking attempts.",
       "createdAt": "2024-07-23T18:10:13Z",
-      "updatedAt": "2024-07-23T18:56:02Z",
+      "updatedAt": "2025-07-18T23:54:38Z",
       "closedAt": null,
       "comments": [
         {
@@ -674,6 +688,13 @@
           "body": "So like in the opening to `6. Security Considerations` explicitly listing some of the considerations to pay attention to.",
           "createdAt": "2024-07-23T18:56:01Z",
           "updatedAt": "2024-07-23T18:56:01Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "We could add a reference to [Attestation-Based Client Authentication](https://datatracker.ietf.org/doc/draft-ietf-oauth-attestation-based-client-auth/) to suggest a way to use a native app platform attestation with this spec. I'm not sure if this would be just general guidance, or would require defining an actual mechanism to make work. It feels like if it requires defining a new mechanism that would be best done as a separate document, which I suspect it will. \n\nI'm thinking things like the `jwks_uri` in the client metadata would point to a public key that the \"Client Attester\" controls, then the native app would be able to use the platform attestation to call the Client Attester service to create an attestation JWT signed with a key advertised in the `jwks_uri`. That would connect all the dots, but I think that is too much to just throw out there as an example.",
+          "createdAt": "2025-07-18T23:54:38Z",
+          "updatedAt": "2025-07-18T23:54:38Z"
         }
       ]
     },
@@ -1092,6 +1113,65 @@
       "updatedAt": "2025-05-29T20:11:27Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 38,
+      "id": "I_kwDOL_Xevs7BZVv1",
+      "title": "Use base URL as client ID, AS should add on `.well-known/oauth-client-metadata` itself",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/38",
+      "state": "OPEN",
+      "author": "aaronpk",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This would make this spec parallel the AS Metadata [RFC8414](https://datatracker.ietf.org/doc/html/rfc8414)) and RS Metadata [RFC9728](https://datatracker.ietf.org/doc/html/rfc9728) specs.\n\nThis would also help address the concern described here: https://github.com/bluesky-social/bsky-docs/pull/363 giving the AS a better way to display a clean URL to the user.",
+      "createdAt": "2025-07-18T23:48:23Z",
+      "updatedAt": "2025-07-19T08:45:51Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "However, this would prevent one host from serving multiple Client ID Metadata Documents (as is often necessary in development/staging environments)",
+          "createdAt": "2025-07-19T00:07:49Z",
+          "updatedAt": "2025-07-19T00:07:49Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Sorry, not fully written out. It doesn't actually prevent that.\n\n`client_id=https://example.com/` metadata at `https://example.com/.well-known/oauth-client-metadata`\n\n`client_id=https://example.com/client1` metadata at `https://example.com/.well-known/oauth-client-metadata/client1`\n\n",
+          "createdAt": "2025-07-19T00:24:48Z",
+          "updatedAt": "2025-07-19T00:24:48Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "That seems like unnecessary indirection? Part of the beauty of these is that the client_id is the direct URI to the document, if you want to inspect it you can just visit the URL.\n\nThis would also break backwards compatibility with Solid-OIDC.",
+          "createdAt": "2025-07-19T00:44:38Z",
+          "updatedAt": "2025-07-19T00:44:38Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "This would also break backwards compatibility with IndieAuth.\n\nThis is based on a long discussion with some MCP folks, largely stemming from the security concern of someone being able to get an AS to fetch arbitrary resources. There are also some threads on the BlueSky repo about these concerns.\n\nRequiring some fixed string in the URL to the metadata helps avoid that, since it limits the possible URLs that can be fetched to URLs that contain the string. There are multiple ways to achieve this:\n\n* Require that `oauth-client-metadata` or some other string appear anywhere in the URL\n* Require the metadata URL ends in `.json` (much more permissive, but better than nothing)\n* Use the `.well-known` pattern like AS and RS Metadata\n\nBlueSky did a hybrid of this which is that *if* a predefined string is used in the URL, the full URL is not displayed to the end user: https://github.com/bluesky-social/atproto-website/issues/419",
+          "createdAt": "2025-07-19T00:51:10Z",
+          "updatedAt": "2025-07-19T00:52:54Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "Additional arguments extracted from the Discord chat about this:\n\n* This would anchor on the hostname as the security boundary of the client. This is both a practical limitation as well as a security feature.\n  * There are much better tools today for creation and management of subdomains compared to 10 years ago\n  * This aligns better with the web origin model in browsers\n* We will have to have the discussion of whether to use the IETF `.well-known` construct (insert `.well-known/oauth-client-metadata` between the host and path, or the OpenID pattern of tacking on `/.well-known/oauth-client-metadata` to the end of the URL\n",
+          "createdAt": "2025-07-19T00:57:38Z",
+          "updatedAt": "2025-07-19T00:57:38Z"
+        },
+        {
+          "author": "panva",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I'd like to draw your attention to this summary of the current inconsistencies in the well-knowns we already have https://mailarchive.ietf.org/arch/msg/oauth/LLoteOrAn0sd172dsll254oHGX4/ in hopes that we can avoid them for future well-knowns.\n\n> We will have to have the discussion of whether to use the IETF .well-known construct (insert .well-known/oauth-client-metadata between the host and path, or the OpenID pattern of tacking on /.well-known/oauth-client-metadata to the end of the URL\n\nI don't think the OpenID pattern would survive the IETF review process (much like it didn't for RFC-to-be 8414 and 9728)",
+          "createdAt": "2025-07-19T08:45:51Z",
+          "updatedAt": "2025-07-19T08:45:51Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -1735,7 +1815,7 @@
       "labels": [],
       "body": "@aaronpk I think this more accurately addresses the safety concerns of @matthieusieben in #10, whilst avoiding the many troubles that developers have been facing trying to work with Client ID Metadata Documents within AT Proto / Bluesky, where they often struggle to do things like:\r\n- develop from their local machine without exposing it to the public internet\r\n- run deployments of their application in private or protected environments (such as PR preview environments or staging environments)\r\n\r\nA Client ID Metadata Document Service would also remove the need for AT Proto's localhost `client_id` system which isn't actually part of this specification: https://atproto.com/specs/oauth#localhost-client-development\r\n\r\n",
       "createdAt": "2025-05-11T20:30:02Z",
-      "updatedAt": "2025-07-16T23:33:23Z",
+      "updatedAt": "2025-07-19T01:25:46Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
@@ -1827,8 +1907,116 @@
               "updatedAt": "2025-07-16T23:33:23Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs605w93",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-19T01:12:47Z",
+          "updatedAt": "2025-07-19T01:12:48Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "```suggestion\r\nAn authorization server may have restrictions on what it accepts as valid `redirect_uris`, for instance, limiting them to the same-origin as the `client_id` or `client_uri` properties. However, if an authorization server does place additional restrictions on the accepted `redirect_uris` then it SHOULD provide at least one Client ID Metadata Document Service (described below) which is exempt from these restrictions.\r\n\r\nWhen developing applications against an authorization server which uses this specification, developers often encounter the issue of \"how do I serve a Client ID Metadata Document at a publicly accessible https URL whilst developing my application on my localhost?\".\r\n```",
+              "createdAt": "2025-07-19T01:12:47Z",
+              "updatedAt": "2025-07-19T01:12:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs605xAx",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-19T01:12:59Z",
+          "updatedAt": "2025-07-19T01:12:59Z",
+          "comments": [
+            {
+              "originalPosition": 12,
+              "body": "```suggestion\r\n```\r\n\r\nMoved to the top",
+              "createdAt": "2025-07-19T01:12:59Z",
+              "updatedAt": "2025-07-19T01:12:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs605xgy",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-19T01:16:43Z",
+          "updatedAt": "2025-07-19T01:16:43Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "I changed this to lowercase \"may\" because we aren't trying to say whether or not the AS should do that, we are just saying that the AS might have its own policy. The normative \"MAY\" is in the \"relationship\" section below.",
+              "createdAt": "2025-07-19T01:16:43Z",
+              "updatedAt": "2025-07-19T01:19:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs605yXu",
+          "commit": {
+            "abbreviatedOid": "8f5c83c"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-19T01:25:39Z",
+          "updatedAt": "2025-07-19T01:25:39Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "I don't think there's anything before this that suggests there would be a restriction, so it seems backwards to say it \"MAY impose no restriction\". It'd be better to flip this around and say it \"MAY impose a restriction .. such as ..\" and then refer to the development section above.",
+              "createdAt": "2025-07-19T01:25:39Z",
+              "updatedAt": "2025-07-19T01:25:39Z"
+            }
+          ]
         }
       ]
+    },
+    {
+      "number": 37,
+      "id": "PR_kwDOL_Xevs6fZPAI",
+      "title": "prohibit all secret based auth methods",
+      "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/37",
+      "state": "MERGED",
+      "author": "panva",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Prohibits all symmetric secret based auth methods. Explicitly naming all the currently defined ones and blanket prohibiting potential future ones.",
+      "createdAt": "2025-07-17T14:35:20Z",
+      "updatedAt": "2025-07-19T01:09:16Z",
+      "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
+      "baseRefName": "main",
+      "baseRefOid": "8764ee56d59a67216c7fd4b8a0326487fc402bbb",
+      "headRepository": "panva/draft-parecki-oauth-client-id-metadata-document",
+      "headRefName": "prohibit-symmetric-auth-methods",
+      "headRefOid": "5c249fa9a51837828cac28fc788f96eb283e7da0",
+      "closedAt": "2025-07-17T14:39:41Z",
+      "mergedAt": "2025-07-17T14:39:41Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "8c19ab34b8eca42fbd798d477f3349fd6a44f596"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
