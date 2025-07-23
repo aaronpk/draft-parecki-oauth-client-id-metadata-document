@@ -88,10 +88,12 @@ Table of Contents
      6.1.  Relationship between redirect_uris and client_id or
            client_uri
      6.2.  Client Authentication
-     6.3.  OAuth Phishing Attacks
-     6.4.  Server Side Request Forgery (SSRF) Attacks
-     6.5.  Maximum Response Size for Client Metadata Documents
-     6.6.  Displaying Logos to End-Users
+     6.3.  Changes in Client Keys
+     6.4.  OAuth Phishing Attacks
+     6.5.  Server Side Request Forgery (SSRF) Attacks
+     6.6.  Maximum Response Size for Client Metadata Documents
+     6.7.  Displaying Logos to End-Users
+     6.8.  Client ID Domain Trust
    7.  IANA Considerations
      7.1.  OAuth Authorization Server Metadata Registry
    8.  References
@@ -240,15 +242,13 @@ Table of Contents
    The authorization server MAY cache the client metadata it discovers
    at the client metadata document URL.
 
-   TBD: recommend a cache lifetime? considerations about stale data?
+   The authorization server SHOULD respect HTTP cache headers [RFC9111]
+   when caching client metadata, but MAY define its own upper and/or
+   lower bounds on an acceptable cache lifetime as well.
 
    The authorization server MUST NOT cache error responses.  The
    authorization server also MUST NOT cache documents which are invalid
    or malformed.
-
-   TBD: Do we want to define an endpoint through which a document can be
-   validated by an authorization server, such that a developer can
-   assert that their document is valid?
 
 4.5.  Redirect URL Registration
 
@@ -315,8 +315,8 @@ Table of Contents
    document.
 
    For example, the client MAY include the following properties in its
-   metadata document to establish a public key and the private_key_jwt
-   authentication method defined in [OpenID]:
+   metadata document to establish a public key and advertise the
+   private_key_jwt authentication method defined in [OpenID]:
 
    {
      ...
@@ -341,7 +341,17 @@ Table of Contents
    service that the mobile app could then use as client authentication
    to the authorization server.
 
-6.3.  OAuth Phishing Attacks
+6.3.  Changes in Client Keys
+
+   If the authorization server notices that the jwks_uri or the contents
+   at the jwks_uri have changed compared to the last time it fetched the
+   metadata, the authorization server MAY take actions such as revoking
+   any tokens issued to this client, or revoking the user's consent for
+   this client.  The particular actions to take are left up to the
+   discretion of the authorization server based on its own risk
+   assessment.
+
+6.4.  OAuth Phishing Attacks
 
    Authorization servers SHOULD fetch the client_id metadata document
    provided in the authorization request in order to provide users with
@@ -359,7 +369,7 @@ Table of Contents
    client_id URL is the only piece of information the user has as an
    indication of which application they are authorizing.
 
-6.4.  Server Side Request Forgery (SSRF) Attacks
+6.5.  Server Side Request Forgery (SSRF) Attacks
 
    Authorization servers fetching the client metadata document and
    resolving URLs located in the metadata document should be aware of
@@ -370,7 +380,7 @@ Table of Contents
    possibility that URLs might be non-http-based URI schemes which can
    lead to other possible SSRF attack vectors.
 
-6.5.  Maximum Response Size for Client Metadata Documents
+6.6.  Maximum Response Size for Client Metadata Documents
 
    Authorization servers SHOULD limit the response size when fetching
    the client metadata document, as to avoid denial of service attacks
@@ -378,7 +388,7 @@ Table of Contents
    (memory, disk, database).  The recommended maximum response size for
    client metadata documents is 5 kilobytes.
 
-6.6.  Displaying Logos to End-Users
+6.7.  Displaying Logos to End-Users
 
    Authorization servers that wish to make use of the logo_uri property
    within client metadata document SHOULD prefetch the file at logo_uri
@@ -392,6 +402,17 @@ Table of Contents
    domain tracking through the logo_uri being requested by the client,
    since the cached file would be served not from the remote URI but
    instead from a URI that the Authorization server trusts.
+
+6.8.  Client ID Domain Trust
+
+   The authorization server MAY choose to have its own heuristics and
+   policies around the trust of domain names used as client IDs.
+
+   For example, the authorization server could require that the first
+   100 users to authorize a client_id see an additional warning screen
+   before the OAuth consent screen.  The authorization server could
+   check attributes of the domain reputation, such as how recently the
+   domain was registered, and put up extra warnings for new domains.
 
 7.  IANA Considerations
 
@@ -485,6 +506,11 @@ Table of Contents
               Authorization Grants", RFC 7523, DOI 10.17487/RFC7523, May
               2015, <https://www.rfc-editor.org/rfc/rfc7523>.
 
+   [RFC9111]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,
+              Ed., "HTTP Caching", STD 98, RFC 9111,
+              DOI 10.17487/RFC9111, June 2022,
+              <https://www.rfc-editor.org/rfc/rfc9111>.
+
    [Solid-OIDC]
               Coburn, A., elf Pavlik, and D. Zagidulin, "Solid-OIDC", 28
               March 2022,
@@ -515,6 +541,11 @@ Document History
 
    *  Added recommendations for development when clients are not on the
       web
+
+   *  Added reference to HTTP Caching RFC9111
+
+   *  Added security considerations around domain trust and changes in
+      client keys
 
    *  Updated references
 

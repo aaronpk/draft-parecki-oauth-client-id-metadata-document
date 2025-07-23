@@ -1201,16 +1201,22 @@ metadata about the client as needed.<a href="#section-abstract-1" class="pilcrow
                 <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-client-authentication" class="internal xref">Client Authentication</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-oauth-phishing-attacks" class="internal xref">OAuth Phishing Attacks</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-changes-in-client-keys" class="internal xref">Changes in Client Keys</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-server-side-request-forgery" class="internal xref">Server Side Request Forgery (SSRF) Attacks</a></p>
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-oauth-phishing-attacks" class="internal xref">OAuth Phishing Attacks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-maximum-response-size-for-c" class="internal xref">Maximum Response Size for Client Metadata Documents</a></p>
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-server-side-request-forgery" class="internal xref">Server Side Request Forgery (SSRF) Attacks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-displaying-logos-to-end-use" class="internal xref">Displaying Logos to End-Users</a></p>
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-maximum-response-size-for-c" class="internal xref">Maximum Response Size for Client Metadata Documents</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-displaying-logos-to-end-use" class="internal xref">Displaying Logos to End-Users</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8">
+                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-client-id-domain-trust" class="internal xref">Client ID Domain Trust</a></p>
 </li>
             </ul>
 </li>
@@ -1370,12 +1376,10 @@ authorization request.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-4.4-1">The authorization server <span class="bcp14">MAY</span> cache the client metadata it discovers at the
 client metadata document URL.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2">TBD: recommend a cache lifetime? considerations about stale data?<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">The authorization server <span class="bcp14">SHOULD</span> respect HTTP cache headers <span>[<a href="#RFC9111" class="cite xref">RFC9111</a>]</span> when caching client metadata,
+but <span class="bcp14">MAY</span> define its own upper and/or lower bounds on an acceptable cache lifetime as well.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
 <p id="section-4.4-3">The authorization server <span class="bcp14">MUST NOT</span> cache error responses. The authorization
 server also <span class="bcp14">MUST NOT</span> cache documents which are invalid or malformed.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
-<p id="section-4.4-4">TBD: Do we want to define an endpoint through which a document can be validated
-by an authorization server, such that a developer can assert that their document
-is valid?<a href="#section-4.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="redirect-url-registration">
@@ -1437,7 +1441,7 @@ prior coordination of client credentials is not possible. However, clients <span
 credentials at the authorization server by using authentication methods that use
 public/private key pairs, by publishing the public key in their metadata document.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 <p id="section-6.2-2">For example, the client <span class="bcp14">MAY</span> include the following properties in its metadata document
-to establish a public key and the <code>private_key_jwt</code> authentication method defined in <span>[<a href="#OpenID" class="cite xref">OpenID</a>]</span>:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+to establish a public key and advertise the <code>private_key_jwt</code> authentication method defined in <span>[<a href="#OpenID" class="cite xref">OpenID</a>]</span>:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-6.2-3">
 <pre>
 {
@@ -1453,39 +1457,56 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
 <p id="section-6.2-5">The particular method of how the client manages the private key is out of scope of this specification, but may include manual provisioning or methods such as Attestation Based Client Authentication <span>[<a href="#I-D.draft-ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.draft-ietf-oauth-attestation-based-client-auth</a>]</span>. For example, the client developer could run a Client Attester Backend, using a native application's platform-specific APIs to authenticate to the backend service, where the private key corresponding to the <code>jwks_uri</code> key is managed by the backend service. This would allow a mobile app to request JWTs from the backend service that the mobile app could then use as client authentication to the authorization server.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="oauth-phishing-attacks">
+<div id="changes-in-client-keys">
 <section id="section-6.3">
-        <h3 id="name-oauth-phishing-attacks">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-oauth-phishing-attacks" class="section-name selfRef">OAuth Phishing Attacks</a>
+        <h3 id="name-changes-in-client-keys">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-changes-in-client-keys" class="section-name selfRef">Changes in Client Keys</a>
         </h3>
-<p id="section-6.3-1">Authorization servers <span class="bcp14">SHOULD</span> fetch the <code>client_id</code> metadata document provided in the authorization request in order to provide users with additional information about the request, such as the application name and logo. If the server does not fetch the client metadata document, then it <span class="bcp14">SHOULD</span> take additional measures to ensure the user is provided with as much information as possible about the request.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">The authorization server <span class="bcp14">SHOULD</span> display the hostname of the <code>client_id</code> on the authorization interface, in addition to displaying the fetched client information if any. Displaying the hostname helps users know that they are authorizing the expected application.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
-<p id="section-6.3-3">If fetching the client metadata document fails for any reason, the <code>client_id</code> URL is the only piece of information the user has as an indication of which application they are authorizing.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+<p id="section-6.3-1">If the authorization server notices that the <code>jwks_uri</code> or the contents at the <code>jwks_uri</code> have changed compared to the last time it fetched the metadata, the authorization server <span class="bcp14">MAY</span> take actions such as revoking any tokens issued to this client, or revoking the user's consent for this client. The particular actions to take are left up to the discretion of the authorization server based on its own risk assessment.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="oauth-phishing-attacks">
+<section id="section-6.4">
+        <h3 id="name-oauth-phishing-attacks">
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-oauth-phishing-attacks" class="section-name selfRef">OAuth Phishing Attacks</a>
+        </h3>
+<p id="section-6.4-1">Authorization servers <span class="bcp14">SHOULD</span> fetch the <code>client_id</code> metadata document provided in the authorization request in order to provide users with additional information about the request, such as the application name and logo. If the server does not fetch the client metadata document, then it <span class="bcp14">SHOULD</span> take additional measures to ensure the user is provided with as much information as possible about the request.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">The authorization server <span class="bcp14">SHOULD</span> display the hostname of the <code>client_id</code> on the authorization interface, in addition to displaying the fetched client information if any. Displaying the hostname helps users know that they are authorizing the expected application.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<p id="section-6.4-3">If fetching the client metadata document fails for any reason, the <code>client_id</code> URL is the only piece of information the user has as an indication of which application they are authorizing.<a href="#section-6.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="server-side-request-forgery-ssrf-attacks">
-<section id="section-6.4">
+<section id="section-6.5">
         <h3 id="name-server-side-request-forgery">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-server-side-request-forgery" class="section-name selfRef">Server Side Request Forgery (SSRF) Attacks</a>
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-server-side-request-forgery" class="section-name selfRef">Server Side Request Forgery (SSRF) Attacks</a>
         </h3>
-<p id="section-6.4-1">Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers <span class="bcp14">SHOULD</span> avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers <span class="bcp14">SHOULD</span> also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.5-1">Authorization servers fetching the client metadata document and resolving URLs located in the metadata document should be aware of possible SSRF attacks. Authorization servers <span class="bcp14">SHOULD</span> avoid fetching any URLs using private or loopback addresses and consider network policies or other measures to prevent making requests to these addresses. Authorization servers <span class="bcp14">SHOULD</span> also be aware of the possibility that URLs might be non-http-based URI schemes which can lead to other possible SSRF attack vectors.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="maximum-response-size-for-client-metadata-documents">
-<section id="section-6.5">
+<section id="section-6.6">
         <h3 id="name-maximum-response-size-for-c">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-maximum-response-size-for-c" class="section-name selfRef">Maximum Response Size for Client Metadata Documents</a>
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-maximum-response-size-for-c" class="section-name selfRef">Maximum Response Size for Client Metadata Documents</a>
         </h3>
-<p id="section-6.5-1">Authorization servers <span class="bcp14">SHOULD</span> limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+<p id="section-6.6-1">Authorization servers <span class="bcp14">SHOULD</span> limit the response size when fetching the client metadata document, as to avoid denial of service attacks against the authorization server by consuming excessive resources (memory, disk, database). The recommended maximum response size for client metadata documents is 5 kilobytes.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="displaying-logos-to-end-users">
-<section id="section-6.6">
+<section id="section-6.7">
         <h3 id="name-displaying-logos-to-end-use">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-displaying-logos-to-end-use" class="section-name selfRef">Displaying Logos to End-Users</a>
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-displaying-logos-to-end-use" class="section-name selfRef">Displaying Logos to End-Users</a>
         </h3>
-<p id="section-6.6-1">Authorization servers that wish to make use of the <code>logo_uri</code> property within client metadata document <span class="bcp14">SHOULD</span> prefetch the file at <code>logo_uri</code> and cache it for the cache duration of the client metadata document. This allows for moderation tools to verify the file contents (e.g., preventing usage of logos that look like other logos), as well as preventing the logo from being dynamically changed to confuse an end-user.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
-<p id="section-6.6-2">Caching of the <code>logo_uri</code> response can additionally prevent cross-domain tracking through the <code>logo_uri</code> being requested by the client, since the cached file would be served not from the remote URI but instead from a URI that the Authorization server trusts.<a href="#section-6.6-2" class="pilcrow">¶</a></p>
+<p id="section-6.7-1">Authorization servers that wish to make use of the <code>logo_uri</code> property within client metadata document <span class="bcp14">SHOULD</span> prefetch the file at <code>logo_uri</code> and cache it for the cache duration of the client metadata document. This allows for moderation tools to verify the file contents (e.g., preventing usage of logos that look like other logos), as well as preventing the logo from being dynamically changed to confuse an end-user.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+<p id="section-6.7-2">Caching of the <code>logo_uri</code> response can additionally prevent cross-domain tracking through the <code>logo_uri</code> being requested by the client, since the cached file would be served not from the remote URI but instead from a URI that the Authorization server trusts.<a href="#section-6.7-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="client-id-domain-trust">
+<section id="section-6.8">
+        <h3 id="name-client-id-domain-trust">
+<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-client-id-domain-trust" class="section-name selfRef">Client ID Domain Trust</a>
+        </h3>
+<p id="section-6.8-1">The authorization server <span class="bcp14">MAY</span> choose to have its own heuristics and policies around the trust of domain names used as client IDs.<a href="#section-6.8-1" class="pilcrow">¶</a></p>
+<p id="section-6.8-2">For example, the authorization server could require that the first 100 users to authorize a <code>client_id</code> see an additional warning screen before the OAuth consent screen. The authorization server could check attributes of the domain reputation, such as how recently the domain was registered, and put up extra warnings for new domains.<a href="#section-6.8-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1591,6 +1612,10 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
         <dd>
 <span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Campbell, B.</span>, and <span class="refAuthor">C. Mortimore</span>, <span class="refTitle">"JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants"</span>, <span class="seriesInfo">RFC 7523</span>, <span class="seriesInfo">DOI 10.17487/RFC7523</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7523">https://www.rfc-editor.org/rfc/rfc7523</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC9111">[RFC9111]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R., Ed.</span>, <span class="refAuthor">Nottingham, M., Ed.</span>, and <span class="refAuthor">J. Reschke, Ed.</span>, <span class="refTitle">"HTTP Caching"</span>, <span class="seriesInfo">STD 98</span>, <span class="seriesInfo">RFC 9111</span>, <span class="seriesInfo">DOI 10.17487/RFC9111</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9111">https://www.rfc-editor.org/rfc/rfc9111</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="Solid-OIDC">[Solid-OIDC]</dt>
       <dd>
 <span class="refAuthor">Coburn, A.</span>, <span class="refAuthor">elf Pavlik</span>, and <span class="refAuthor">D. Zagidulin</span>, <span class="refTitle">"Solid-OIDC"</span>, <time datetime="2022-03-28" class="refDate">28 March 2022</time>, <span>&lt;<a href="https://solidproject.org/TR/2022/oidc-20220328">https://solidproject.org/TR/2022/oidc-20220328</a>&gt;</span>. </dd>
@@ -1624,7 +1649,13 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
           <p id="appendix-B-3.2.1">Added recommendations for development when clients are not on the web<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.3">
-          <p id="appendix-B-3.3.1">Updated references<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.3.1">Added reference to HTTP Caching RFC9111<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.4">
+          <p id="appendix-B-3.4.1">Added security considerations around domain trust and changes in client keys<a href="#appendix-B-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.5">
+          <p id="appendix-B-3.5.1">Updated references<a href="#appendix-B-3.5.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-02<a href="#appendix-B-4" class="pilcrow">¶</a></p>
