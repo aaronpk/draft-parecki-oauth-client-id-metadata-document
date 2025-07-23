@@ -241,11 +241,11 @@ In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OA
 
 ## Relationship between `redirect_uris` and `client_id` or `client_uri` {#redirect_uri_relationship}
 
-An authorization server MAY impose no restriction or relationship between the `redirect_uris` and the `client_id` or `client_uri` properties, allowing for a Client ID Metadata Document to be hosted anywhere on the public web, however, this comes with security considerations of potential trust and safety issues, where the client attempts to impersonate a more well-known client or otherwise act in a way which is malicious or puts the end-user at risk.
+An authorization server MAY impose restrictions or relationships between the `redirect_uris` and the `client_id` or `client_uri` properties, for example to restrict the `redirect_uri` to the same-origin as the Client ID Metadata Document. Without restrictions like these, there are potential trust and safety issues where the client attempts to impersonate a more well-known client or otherwise act in a way which is malicious or puts the end-user at risk.
 
 Having no restrictions on the relationship between `redirect_uris` and `client_id` or `client_uri` was a common practice with {{Solid-OIDC}}'s Client ID Documents, so this ability is preserved for backwards compatibility between {{Solid-OIDC}} and this specification.
 
-Some authorization servers have already imposed restrictions on `redirect_uris`, and these restrictions have consequently made developer usage of Client ID Metadata Documents difficult, see the section on  {{documents_for_development}}.
+Some restrictions on `redirect_uris` can make developer usage of Client ID Metadata Documents difficult. The section {{documents_for_development}} contains recommendations for enabling development usage of Client ID Metadata Documents for authorization servers that impose restrictions on the `redirect_uri`.
 
 ## Client Authentication {#client_authentication}
 
