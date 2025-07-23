@@ -192,7 +192,6 @@ To enable developers to author applications on their machines, without exposing 
 
 A Client ID Metadata Document Service is a web service through which developers can acquire a stable URL to a Client ID Metadata Document. This service MAY expire clients from time to time, and MAY require developers to provide additional information about the client being developed.
 
-An authorization server MAY place additional restrictions on the `redirect_uris`, for instance, limiting them to the same-origin as the `client_id` or `client_uri` properties, however, if an authorization server does place additional restrictions on the `redirect_uris` then it SHOULD provide at least one Client ID Metadata Document Service which is exempt from these restrictions.
 
 By providing at least one Client ID Metadata Document Service, an authorization server can enable developers to create applications, and still indicate to non-technical people that the client that they are about to authorize is currently under-development and may not be trustworthy or secure.
 
