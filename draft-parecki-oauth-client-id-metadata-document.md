@@ -89,6 +89,7 @@ informative:
         org: Connect2id
   I-D.draft-ietf-oauth-attestation-based-client-auth:
   RFC7523:
+  RFC9111:
 
 entity:
   SELF: "[draft-parecki-oauth-client-id-metadata-document-latest]"
@@ -208,7 +209,8 @@ authorization request.
 The authorization server MAY cache the client metadata it discovers at the
 client metadata document URL.
 
-TBD: recommend a cache lifetime? considerations about stale data?
+The authorization server SHOULD respect HTTP cache headers {{RFC9111}} when caching client metadata,
+but MAY define its own upper and/or lower bounds on an acceptable cache lifetime as well.
 
 The authorization server MUST NOT cache error responses. The authorization
 server also MUST NOT cache documents which are invalid or malformed.
