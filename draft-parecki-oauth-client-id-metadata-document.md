@@ -184,6 +184,8 @@ TBD: We may want a property such as `client_id_expires_at` for indicating that t
 
 ## Client Metadata Documents for Development Purposes {#documents_for_development}
 
+An authorization server may have restrictions on what it accepts as valid `redirect_uris`, for instance, limiting them to the same-origin as the `client_id` or `client_uri` properties. However, if an authorization server does place additional restrictions on the accepted `redirect_uris` then it SHOULD provide at least one Client ID Metadata Document Service (described below) which is exempt from these restrictions.
+
 When developing applications against an authorization server which uses this specification, developers often encounter the issue of "how do I serve a Client ID Metadata Document at a publicly accessible https URL whilst developing my application on my localhost?".
 
 To enable developers to author applications on their machines, without exposing their machines to the public internet, the usage of Client ID Metadata Document Services by the authorization server is RECOMMENDED.
