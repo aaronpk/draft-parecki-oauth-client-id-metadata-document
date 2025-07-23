@@ -184,6 +184,19 @@ by requiring the `token_endpoint_auth_method` property be set to `"none"`.
 
 TBD: We may want a property such as `client_id_expires_at` for indicating that the client is ephemeral and not valid after a given timestamp, especially for documents issued by a service for development purposes.
 
+## Client Metadata Documents for Development Purposes {#documents_for_development}
+
+An authorization server may have restrictions on what it accepts as valid `redirect_uris`, for instance, limiting them to the same-origin as the `client_id` or `client_uri` properties. However, if an authorization server does place additional restrictions on the accepted `redirect_uris` then it SHOULD provide at least one Client ID Metadata Document Service (described below) which is exempt from these restrictions.
+
+When developing applications against an authorization server which uses this specification, developers often encounter the issue of "how do I serve a Client ID Metadata Document at a publicly accessible https URL whilst developing my application on my localhost?".
+
+To enable developers to author applications on their machines, without exposing their machines to the public internet, the usage of Client ID Metadata Document Services by the authorization server is RECOMMENDED.
+
+A Client ID Metadata Document Service is a web service through which developers can acquire a stable URL to a Client ID Metadata Document. This service MAY expire clients from time to time, and MAY require developers to provide additional information about the client being developed.
+
+
+By providing at least one Client ID Metadata Document Service, an authorization server can enable developers to create applications, and still indicate to non-technical people that the client that they are about to authorize is currently under-development and may not be trustworthy or secure.
+
 ## Metadata Discovery Errors
 
 If fetching the metadata document fails, the authorization server SHOULD abort the
@@ -228,11 +241,13 @@ This enables clients to avoid sending the user to a dead end, by only redirectin
 
 In addition to the security considerations in OAuth 2.0 Core {{RFC6749}}, and OAuth 2.0 Threat Model and Security Considerations {{RFC6819}}, and {{RFC9700}} the additional considerations apply.
 
-## Client ID Metadata Documents for Development Purposes {#documents_for_development}
+## Relationship between `redirect_uris` and `client_id` or `client_uri` {#redirect_uri_relationship}
 
-When developing applications against a service that uses Client ID Metadata Documents, developers often encounter the issue of "how do I serve a Client ID Metadata Document at a https URL whilst developing my application?".
+An authorization server MAY impose restrictions or relationships between the `redirect_uris` and the `client_id` or `client_uri` properties, for example to restrict the `redirect_uri` to the same-origin as the Client ID Metadata Document. Without restrictions like these, there are potential trust and safety issues where the client attempts to impersonate a more well-known client or otherwise act in a way which is malicious or puts the end-user at risk.
 
-For this purpose, it is recommended to either host a document on a webserver somewhere that describes the application under development (e.g., using localhost redirect URIs), or to use a service which can generate and host a Client ID Metadata Document for you. Such a service should issue URLs that are stable.
+Having no restrictions on the relationship between `redirect_uris` and `client_id` or `client_uri` was a common practice with {{Solid-OIDC}}'s Client ID Documents, so this ability is preserved for backwards compatibility between {{Solid-OIDC}} and this specification.
+
+Some restrictions on `redirect_uris` can make developer usage of Client ID Metadata Documents difficult. The section {{documents_for_development}} contains recommendations for enabling development usage of Client ID Metadata Documents for authorization servers that impose restrictions on the `redirect_uri`.
 
 ## Client Authentication {#client_authentication}
 
