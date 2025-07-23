@@ -215,9 +215,6 @@ but MAY define its own upper and/or lower bounds on an acceptable cache lifetime
 The authorization server MUST NOT cache error responses. The authorization
 server also MUST NOT cache documents which are invalid or malformed.
 
-TBD: Do we want to define an endpoint through which a document can be validated
-by an authorization server, such that a developer can assert that their document
-is valid?
 
 ## Redirect URL Registration
 
@@ -260,7 +257,7 @@ credentials at the authorization server by using authentication methods that use
 public/private key pairs, by publishing the public key in their metadata document.
 
 For example, the client MAY include the following properties in its metadata document
-to establish a public key and the `private_key_jwt` authentication method defined in {{OpenID}}:
+to establish a public key and advertise the `private_key_jwt` authentication method defined in {{OpenID}}:
 
     {
       ...
@@ -273,6 +270,12 @@ This establishes this client as a confidential client, and any communication wit
 the authorization server MUST include client authentication of the registered type.
 
 The particular method of how the client manages the private key is out of scope of this specification, but may include manual provisioning or methods such as Attestation Based Client Authentication [I-D.draft-ietf-oauth-attestation-based-client-auth]. For example, the client developer could run a Client Attester Backend, using a native application's platform-specific APIs to authenticate to the backend service, where the private key corresponding to the `jwks_uri` key is managed by the backend service. This would allow a mobile app to request JWTs from the backend service that the mobile app could then use as client authentication to the authorization server.
+
+
+## Changes in Client Keys
+
+If the authorization server notices that the `jwks_uri` or the contents at the `jwks_uri` have changed compared to the last time it fetched the metadata, the authorization server MAY take actions such as revoking any tokens issued to this client, or revoking the user's consent for this client. The particular actions to take are left up to the discretion of the authorization server based on its own risk assessment.
+
 
 ## OAuth Phishing Attacks
 
@@ -298,6 +301,13 @@ Authorization servers SHOULD limit the response size when fetching the client me
 Authorization servers that wish to make use of the `logo_uri` property within client metadata document SHOULD prefetch the file at `logo_uri` and cache it for the cache duration of the client metadata document. This allows for moderation tools to verify the file contents (e.g., preventing usage of logos that look like other logos), as well as preventing the logo from being dynamically changed to confuse an end-user.
 
 Caching of the `logo_uri` response can additionally prevent cross-domain tracking through the `logo_uri` being requested by the client, since the cached file would be served not from the remote URI but instead from a URI that the Authorization server trusts.
+
+## Client ID Domain Trust
+
+The authorization server MAY choose to have its own heuristics and policies around the trust of domain names used as client IDs.
+
+For example, the authorization server could require that the first 100 users to authorize a `client_id` see an additional warning screen before the OAuth consent screen. The authorization server could check attributes of the domain reputation, such as how recently the domain was registered, and put up extra warnings for new domains.
+
 
 # IANA Considerations
 
@@ -331,6 +341,8 @@ The authors would like to thank the following people for their contributions and
 
 * Prohibit all forms of symmetric client authentication, not just client secret
 * Added recommendations for development when clients are not on the web
+* Added reference to HTTP Caching RFC9111
+* Added security considerations around domain trust and changes in client keys
 * Updated references
 
 
