@@ -1450,7 +1450,7 @@ to establish a public key and the <code>private_key_jwt</code> authentication me
 </div>
 <p id="section-6.2-4">This establishes this client as a confidential client, and any communication with
 the authorization server <span class="bcp14">MUST</span> include client authentication of the registered type.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
-<p id="section-6.2-5">The particular method of associating the private key with the client is out of scope of this specification, but may include methods such as Attestation Based Client Authentication <span>[<a href="#I-D.draft-ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.draft-ietf-oauth-attestation-based-client-auth</a>]</span>.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">The particular method of how the client manages the private key is out of scope of this specification, but may include manual provisioning or methods such as Attestation Based Client Authentication <span>[<a href="#I-D.draft-ietf-oauth-attestation-based-client-auth" class="cite xref">I-D.draft-ietf-oauth-attestation-based-client-auth</a>]</span>. For example, the client developer could run a Client Attester Backend, using a native application's platform-specific APIs to authenticate to the backend service, where the private key corresponding to the <code>jwks_uri</code> key is managed by the backend service. This would allow a mobile app to request JWTs from the backend service that the mobile app could then use as client authentication to the authorization server.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="oauth-phishing-attacks">
@@ -1587,6 +1587,10 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
         <dd>
 <span class="refAuthor">Hedberg, R.</span>, <span class="refAuthor">Jones, M.B.</span>, <span class="refAuthor">Solberg, A.Å.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Marco, G. D.</span>, and <span class="refAuthor">V. Dzhuvinov</span>, <span class="refTitle">"OpenID Federation 1.0"</span>, <time datetime="2024-05-17" class="refDate">17 May 2024</time>, <span>&lt;<a href="https://openid.net/specs/openid-federation-1_0.html">https://openid.net/specs/openid-federation-1_0.html</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC7523">[RFC7523]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Campbell, B.</span>, and <span class="refAuthor">C. Mortimore</span>, <span class="refTitle">"JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants"</span>, <span class="seriesInfo">RFC 7523</span>, <span class="seriesInfo">DOI 10.17487/RFC7523</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7523">https://www.rfc-editor.org/rfc/rfc7523</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="Solid-OIDC">[Solid-OIDC]</dt>
       <dd>
 <span class="refAuthor">Coburn, A.</span>, <span class="refAuthor">elf Pavlik</span>, and <span class="refAuthor">D. Zagidulin</span>, <span class="refTitle">"Solid-OIDC"</span>, <time datetime="2022-03-28" class="refDate">28 March 2022</time>, <span>&lt;<a href="https://solidproject.org/TR/2022/oidc-20220328">https://solidproject.org/TR/2022/oidc-20220328</a>&gt;</span>. </dd>
@@ -1617,7 +1621,10 @@ the authorization server <span class="bcp14">MUST</span> include client authenti
           <p id="appendix-B-3.1.1">Prohibit all forms of symmetric client authentication, not just client secret<a href="#appendix-B-3.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-B-3.2">
-          <p id="appendix-B-3.2.1">Updated references<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
+          <p id="appendix-B-3.2.1">Added recommendations for development when clients are not on the web<a href="#appendix-B-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-B-3.3">
+          <p id="appendix-B-3.3.1">Updated references<a href="#appendix-B-3.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-B-4">-02<a href="#appendix-B-4" class="pilcrow">¶</a></p>
