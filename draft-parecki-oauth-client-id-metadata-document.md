@@ -88,6 +88,7 @@ informative:
       - name: V. Dzhuvinov
         org: Connect2id
   I-D.draft-ietf-oauth-attestation-based-client-auth:
+  RFC7523:
 
 entity:
   SELF: "[draft-parecki-oauth-client-id-metadata-document-latest]"
@@ -269,7 +270,7 @@ to establish a public key and the `private_key_jwt` authentication method define
 This establishes this client as a confidential client, and any communication with
 the authorization server MUST include client authentication of the registered type.
 
-The particular method of associating the private key with the client is out of scope of this specification, but may include methods such as Attestation Based Client Authentication [I-D.draft-ietf-oauth-attestation-based-client-auth].
+The particular method of how the client manages the private key is out of scope of this specification, but may include manual provisioning or methods such as Attestation Based Client Authentication [I-D.draft-ietf-oauth-attestation-based-client-auth]. For example, the client developer could run a Client Attester Backend, using a native application's platform-specific APIs to authenticate to the backend service, where the private key corresponding to the `jwks_uri` key is managed by the backend service. This would allow a mobile app to request JWTs from the backend service that the mobile app could then use as client authentication to the authorization server.
 
 ## OAuth Phishing Attacks
 
@@ -327,6 +328,7 @@ The authors would like to thank the following people for their contributions and
 -03
 
 * Prohibit all forms of symmetric client authentication, not just client secret
+* Added recommendations for development when clients are not on the web
 * Updated references
 
 
