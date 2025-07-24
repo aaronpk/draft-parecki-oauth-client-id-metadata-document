@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-20T00:49:24.685594+00:00",
+  "timestamp": "2025-07-24T00:43:29.380274+00:00",
   "repo": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -55,15 +55,15 @@
       "id": "I_kwDOL_Xevs6KwO1L",
       "title": "Caching recommendations for the metadata document",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "aaronpk",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "https://drafts.aaronpk.com/draft-parecki-oauth-client-id-metadata-document/draft-parecki-oauth-client-id-metadata-document.html#name-metadata-caching\r\n\r\nProbably makes sense to respect the HTTP cache headers from the metadata URL.\r\n\r\nThe AS should probably also have its own min/max cache lifetime policy. Not sure if we want to recommend something explicit here though since it might depend on the particular deployment.",
       "createdAt": "2024-05-31T13:56:13Z",
-      "updatedAt": "2025-05-29T20:12:52Z",
-      "closedAt": null,
+      "updatedAt": "2025-07-23T01:23:41Z",
+      "closedAt": "2025-07-23T01:23:41Z",
       "comments": [
         {
           "author": "sdesen",
@@ -710,9 +710,17 @@
       "labels": [],
       "body": "In OAuth 2.0 Security Best Current Practices, there's [the paragraph](https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-27.html#section-2.6-4):\r\n\r\n> Under the conditions described in [Section 4.15.1](https://www.ietf.org/archive/id/draft-ietf-oauth-security-topics-27.html#client_impersonating_countermeasures), authorization servers SHOULD NOT allow clients to influence their client_id or any claim that could cause confusion with a genuine resource owner.\r\n\r\nSince this proposal explicitly allows for user-supplied client_id values, we should probably include security guidance for such:\r\n\r\nThis is likely related to #17 \r\n",
       "createdAt": "2024-07-24T17:45:05Z",
-      "updatedAt": "2024-07-24T17:45:05Z",
+      "updatedAt": "2025-07-23T00:55:49Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "body": "I think this doesn't apply here, because of this from the Security BCP:\n\n> ...if a common namespace for client IDs and user identifiers exists\n\n",
+          "createdAt": "2025-07-23T00:55:49Z",
+          "updatedAt": "2025-07-23T00:55:49Z"
+        }
+      ]
     },
     {
       "number": 23,
@@ -1126,7 +1134,7 @@
       "labels": [],
       "body": "This would make this spec parallel the AS Metadata [RFC8414](https://datatracker.ietf.org/doc/html/rfc8414)) and RS Metadata [RFC9728](https://datatracker.ietf.org/doc/html/rfc9728) specs.\n\nThis would also help address the concern described here: https://github.com/bluesky-social/bsky-docs/pull/363 giving the AS a better way to display a clean URL to the user.",
       "createdAt": "2025-07-18T23:48:23Z",
-      "updatedAt": "2025-07-19T08:45:51Z",
+      "updatedAt": "2025-07-23T18:09:26Z",
       "closedAt": null,
       "comments": [
         {
@@ -1170,6 +1178,13 @@
           "body": "I'd like to draw your attention to this summary of the current inconsistencies in the well-knowns we already have https://mailarchive.ietf.org/arch/msg/oauth/LLoteOrAn0sd172dsll254oHGX4/ in hopes that we can avoid them for future well-knowns.\n\n> We will have to have the discussion of whether to use the IETF .well-known construct (insert .well-known/oauth-client-metadata between the host and path, or the OpenID pattern of tacking on /.well-known/oauth-client-metadata to the end of the URL\n\nI don't think the OpenID pattern would survive the IETF review process (much like it didn't for RFC-to-be 8414 and 9728)",
           "createdAt": "2025-07-19T08:45:51Z",
           "updatedAt": "2025-07-19T08:45:51Z"
+        },
+        {
+          "author": "ThisIsMissEm",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think I'd be fine with adding a constraint that the Client ID Metadata Document URL `MUST` contain a path component and `MUST` end with `.json` \u2014 this _should_ be compatible with all existing deployments, including the prior art from Solid OIDC.\n\nWe could also add in a recommendation that \"should a Client ID Metadata Document fail to resolve to a valid JSON document over successive calls (with backoff), then the URL/host should change to a \"banned hosts\" state. i.e., too many failures on a give domain, and the domain gets prohibited from being used.",
+          "createdAt": "2025-07-23T18:09:26Z",
+          "updatedAt": "2025-07-23T18:09:26Z"
         }
       ]
     }
@@ -1808,24 +1823,26 @@
       "id": "PR_kwDOL_Xevs6VvsMW",
       "title": "Improve development clients section, enabling developers",
       "url": "https://github.com/aaronpk/draft-parecki-oauth-client-id-metadata-document/pull/35",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "ThisIsMissEm",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "@aaronpk I think this more accurately addresses the safety concerns of @matthieusieben in #10, whilst avoiding the many troubles that developers have been facing trying to work with Client ID Metadata Documents within AT Proto / Bluesky, where they often struggle to do things like:\r\n- develop from their local machine without exposing it to the public internet\r\n- run deployments of their application in private or protected environments (such as PR preview environments or staging environments)\r\n\r\nA Client ID Metadata Document Service would also remove the need for AT Proto's localhost `client_id` system which isn't actually part of this specification: https://atproto.com/specs/oauth#localhost-client-development\r\n\r\n",
       "createdAt": "2025-05-11T20:30:02Z",
-      "updatedAt": "2025-07-19T01:25:46Z",
+      "updatedAt": "2025-07-23T00:52:14Z",
       "baseRepository": "aaronpk/draft-parecki-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "46f251c5496c1ae4871c2d925d47cd765d8e46a5",
       "headRepository": "ThisIsMissEm/draft-parecki-oauth-client-id-metadata-document",
       "headRefName": "feat/development-clients",
-      "headRefOid": "8f5c83cafa86ad699801f114a8c5da33bfdc0fe1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "1ca96709db0278eaeb65f13a879e0148bb76b471",
+      "closedAt": "2025-07-23T00:52:14Z",
+      "mergedAt": "2025-07-23T00:52:14Z",
+      "mergedBy": "aaronpk",
+      "mergeCommit": {
+        "oid": "bf65964a84da3b4e18fbcbb375bb43a428f3e840"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1985,6 +2002,46 @@
               "body": "I don't think there's anything before this that suggests there would be a restriction, so it seems backwards to say it \"MAY impose no restriction\". It'd be better to flip this around and say it \"MAY impose a restriction .. such as ..\" and then refer to the development section above.",
               "createdAt": "2025-07-19T01:25:39Z",
               "updatedAt": "2025-07-19T01:25:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs61gpDw",
+          "commit": {
+            "abbreviatedOid": "2e858f8"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-23T00:39:15Z",
+          "updatedAt": "2025-07-23T00:39:16Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "```suggestion\r\nAn authorization server MAY impose restrictions or relationships between the `redirect_uris` and the `client_id` or `client_uri` properties, for example to restrict the `redirect_uri` to the same-origin as the Client ID Metadata Document. Without restrictions like these, there are potential trust and safety issues where the client attempts to impersonate a more well-known client or otherwise act in a way which is malicious or puts the end-user at risk.\r\n```",
+              "createdAt": "2025-07-23T00:39:16Z",
+              "updatedAt": "2025-07-23T00:39:16Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs61gqqe",
+          "commit": {
+            "abbreviatedOid": "2e858f8"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-23T00:44:21Z",
+          "updatedAt": "2025-07-23T00:44:21Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "```suggestion\r\nSome restrictions on `redirect_uris` can make developer usage of Client ID Metadata Documents difficult. The section {{documents_for_development}} contains recommendations for enabling development usage of Client ID Metadata Documents for authorization servers that impose restrictions on the `redirect_uri`.\r\n```",
+              "createdAt": "2025-07-23T00:44:21Z",
+              "updatedAt": "2025-07-23T00:44:21Z"
             }
           ]
         }
