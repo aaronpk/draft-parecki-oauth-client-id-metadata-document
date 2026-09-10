@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-09-06T00:00:24.433626+00:00",
+  "timestamp": "2026-09-10T00:00:33.299148+00:00",
   "repo": "oauth-wg/draft-ietf-oauth-client-id-metadata-document",
   "labels": [
     {
@@ -6400,22 +6400,22 @@
     {
       "number": 98,
       "id": "PR_kwDOL_Xevs8AAAABAKzL-w",
-      "title": "normalize and compare Client Identifier URLs per Section 4.2.3 of RFC9110",
+      "title": "recommend that the client normalize its Client Identifier URL",
       "url": "https://github.com/oauth-wg/draft-ietf-oauth-client-id-metadata-document/pull/98",
       "state": "OPEN",
       "author": "kamronbatman",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
-      "body": "The Client Identifier URL section states that `https://example.com/client` and `https://example.com:443/client` are not equivalent even though 443 is the default port for the `https` scheme. They are equivalent.\n\nSection 3.2.3 of RFC 3986 directs URI producers to omit a port that is the same as the scheme's default, and Section 4.2.3 of RFC 9110 states that distinct resources SHOULD NOT be identified by HTTP URIs that are equivalent after normalization, and that any HTTP component may perform that normalization. The two forms are also indistinguishable on the wire, since the default port is omitted from the Host header.\n\nThis defers to Section 4.2.3 of RFC 9110 for normalization and comparison rather than constraining the form a Client Identifier URL may take, so the requirements list is unchanged. The `client_id` property comparison is aligned with the same section, since leaving it as simple string comparison would have contradicted the above. A security consideration is added for normalizing more aggressively than RFC 9110 describes.\n\nAddresses the port question raised in Justin Richer's review, #79.\n\nThis PR was built with AI Assistance and has been thoroughly reviewed and authorized by Kamron Batman\n",
+      "body": "The Client Identifier URL section states that `https://example.com/client` and `https://example.com:443/client` are not equivalent even though 443 is the default port for the `https` scheme. Under RFC 3986 they are equivalent: Section 3.2.3 directs URI producers to omit a port that is the same as the scheme's default, and Section 6.2.3 lists the two forms as equivalent. The two forms are also indistinguishable on the wire, since the default port is omitted from the Host header.\n\nAs settled in the discussion below, the authorization server continues to do strict string comparison and does no normalization. Instead, the client SHOULD produce a normalized Client Identifier URL, by reference to the syntax-based and scheme-based normalization in Sections 6.2.2 and 6.2.3 of RFC 3986, which cover the scheme and host case, the default port, dot-segments, and percent-encoding. The example is reworded as a consequence of comparison: a client that presents `:443` in one request and no port in another is treated as two different clients. No new references are added.\n\nEarlier revisions of this PR had the authorization server normalize before comparing; that approach was withdrawn per the review.\n\nAddresses the port question raised in Justin Richer's review, #79.\n\nThis PR was built with AI Assistance and has been thoroughly reviewed and authorized by Kamron Batman\n",
       "createdAt": "2026-08-18T15:59:52Z",
-      "updatedAt": "2026-08-19T23:01:27Z",
+      "updatedAt": "2026-09-09T05:00:33Z",
       "baseRepository": "oauth-wg/draft-ietf-oauth-client-id-metadata-document",
       "baseRefName": "main",
       "baseRefOid": "8f53aecfaa820023f0f71fe5f0c299db725374d3",
       "headRepository": "kamronbatman/draft-ietf-oauth-client-id-metadata-document",
       "headRefName": "client-id-url-normal-form",
-      "headRefOid": "fa0d9a296e71d4fa82754ec7ba2d98351163315f",
+      "headRefOid": "1ea9174d3719cce4fffcd5e2bf86cee5b8bb988c",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -6462,9 +6462,78 @@
           "body": "> This exception is for redirect URIs, not for Client Identifiers.\r\n\r\nThat's correct. I've shared it for one reason - show that Simple String Comparison is almost always in use (otherwise there are security implications). On a side note, RFC 8252 could definitely handled better this situation with variable port numbers for native apps (by omitting them).\r\n\r\nInterestingly enough, the OpenID Connect Core spec has a dedicated section on that at https://openid.net/specs/openid-connect-core-1_0.html#StringOps.",
           "createdAt": "2026-08-19T22:08:15Z",
           "updatedAt": "2026-08-19T22:08:15Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "MEMBER",
+          "body": "The goal of the \"strict string comparison\" was to make it easy to compare two URLs. This language was originally about comparing registered redirect URLs and appears in RFC9700 https://www.rfc-editor.org/rfc/rfc9700.html#section-4.1.3.\r\n\r\nI would be in favor of requiring that the client produce a reasonably normalized URL for itself, but not require that the AS do any transformations when comparing. So if a client one day shows up at an AS as `https://example.com:443/client.json` and the next day as `https://example.com/client.json` it's fair for the AS to consider those two separate clients. Similarly if an AS has pre-registered `https://example.com/client.json` and the client presents `https://example.com:443/client.json` it would be expected that the AS rejects it.\r\n\r\nSo some language around the client producing a URL following the normalization guidelines in 3986/9110 would make sense to me.",
+          "createdAt": "2026-09-09T03:33:20Z",
+          "updatedAt": "2026-09-09T03:33:20Z"
+        },
+        {
+          "author": "kamronbatman",
+          "authorAssociation": "NONE",
+          "body": "> The goal of the \"strict string comparison\" was to make it easy to compare two URLs. This language was originally about comparing registered redirect URLs and appears in RFC9700 https://www.rfc-editor.org/rfc/rfc9700.html#section-4.1.3.\r\n> \r\n> I would be in favor of requiring that the client produce a reasonably normalized URL for itself, but not require that the AS do any transformations when comparing. So if a client one day shows up at an AS as `https://example.com:443/client.json` and the next day as `https://example.com/client.json` it's fair for the AS to consider those two separate clients. Similarly if an AS has pre-registered `https://example.com/client.json` and the client presents `https://example.com:443/client.json` it would be expected that the AS rejects it.\r\n> \r\n> So some language around the client producing a URL following the normalization guidelines in 3986/9110 would make sense to me.\r\n\r\nOk, makes sense I guess. I think host-sensitivity is also clearly defined then.\r\nDoes this extend to all scenarios? I am not sure if percent-encoding is as clear cut. Trying to nail down what is reasonable so we can be properly explicit where necessary.",
+          "createdAt": "2026-09-09T04:02:55Z",
+          "updatedAt": "2026-09-09T04:05:28Z"
+        },
+        {
+          "author": "aaronpk",
+          "authorAssociation": "MEMBER",
+          "body": "I'm hoping there is some existing language we can reference from the URI spec to not have to repeat everything here. Basically the client should try to produce as \"clean\" or \"normal\" of a URL as possible, the AS is only expected to do strict string comparison.",
+          "createdAt": "2026-09-09T04:07:22Z",
+          "updatedAt": "2026-09-09T04:07:22Z"
+        },
+        {
+          "author": "kamronbatman",
+          "authorAssociation": "NONE",
+          "body": "> I'm hoping there is some existing language we can reference from the URI spec to not have to repeat everything here. Basically the client should try to produce as \"clean\" or \"normal\" of a URL as possible, the AS is only expected to do strict string comparison.\r\n\r\n@aaronpk - I updated it accordingly. Should be good enough from what I can tell.\r\nI am still not sure about the percent-encoding. We might need to think about security implications. Let's continue discussions, but that can be separate from this PR.",
+          "createdAt": "2026-09-09T04:32:12Z",
+          "updatedAt": "2026-09-09T04:35:25Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOL_Xevs8AAAABMvTkIg",
+          "commit": {
+            "abbreviatedOid": "0cc6f43"
+          },
+          "author": "aaronpk",
+          "authorAssociation": "MEMBER",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-09-09T04:48:46Z",
+          "updatedAt": "2026-09-09T04:48:52Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "This isn't clear who is doing the normalization here. I think we need to be extra explicit that it's the client that's expected to do it.\n\nAlso RFC8820 updates 3986, I haven't checked if those two sections actually have equivalents in 8820, but we should use the most recent revision of the URI RFC where possible.",
+              "createdAt": "2026-09-09T04:48:46Z",
+              "updatedAt": "2026-09-09T04:48:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOL_Xevs8AAAABMvXiaQ",
+          "commit": {
+            "abbreviatedOid": "0cc6f43"
+          },
+          "author": "kamronbatman",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-09-09T04:59:53Z",
+          "updatedAt": "2026-09-09T04:59:53Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "I don't see equivalents, but you are right that we should be more explicit.\r\n\r\nEDIT:\r\nI opted for a description block below that makes it more explicit. Let me know if that works!",
+              "createdAt": "2026-09-09T04:59:53Z",
+              "updatedAt": "2026-09-09T05:02:17Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
